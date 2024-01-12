@@ -23,6 +23,7 @@ import { CommentsController } from './controllers/comments.controller';
 import { UsersRepository } from './repositories/users.repository';
 import { UsersQueryRepository } from './repositories/query/users.query.repository';
 import { BcryptAdapter } from './adapters/bcrypt.adapter';
+import { UsersController } from './controllers/users.controller';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { BcryptAdapter } from './adapters/bcrypt.adapter';
     BlogsController,
     PostsController,
     CommentsController,
+    UsersController,
   ],
   providers: [
     AppService,
