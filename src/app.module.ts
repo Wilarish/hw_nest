@@ -20,6 +20,9 @@ import { CommentsMainClass, CommentsSchema } from './schemas/comments.schema';
 import { CommentsRepository } from './repositories/comments.repository';
 import { CommentsQueryRepository } from './repositories/query/comments.query.repository';
 import { CommentsController } from './controllers/comments.controller';
+import { UsersRepository } from './repositories/users.repository';
+import { UsersQueryRepository } from './repositories/query/users.query.repository';
+import { BcryptAdapter } from './adapters/bcrypt.adapter';
 
 @Module({
   imports: [
@@ -55,12 +58,17 @@ import { CommentsController } from './controllers/comments.controller';
     CommentsService,
     PostsService,
     UsersService,
-    BlogsRepository,
+
+    UsersQueryRepository,
     BlogsQueryRepository,
     PostsQueryRepository,
     CommentsRepository,
     CommentsQueryRepository,
     PostsRepository,
+    BlogsRepository,
+    UsersRepository,
+
+    BcryptAdapter,
   ],
 })
 export class AppModule {}
