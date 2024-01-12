@@ -52,6 +52,10 @@ export class BlogsController {
   }
   @Get(':id/posts')
   async getAllPostsForBlogs(@Param('id') blogId: string, @Query() params: any) {
+    const blog: BlogsViewType | null =
+      await this.blogsQueryRepository.returnViewBlogById(blogId);
+    if (!blog) throw new HttpException('404 not found', HttpStatus.NOT_FOUND);
+
     const pagination = getDefaultPagination(params);
     const posts: Paginated<PostsViewType> =
       await this.blogsQueryRepository.returnViewPostsForBlogsById(
