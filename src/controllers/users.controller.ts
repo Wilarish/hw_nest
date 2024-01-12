@@ -42,6 +42,10 @@ export class UsersController {
     const user: UsersViewType | null =
       await this.usersQueryRepository.returnViewUserById(idOfCreatedUser);
 
+    console.log(idOfCreatedUser);
+
+    console.log(user);
+
     return user;
   }
 

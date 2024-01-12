@@ -52,10 +52,10 @@ export class UsersQueryRepository {
     };
   }
 
-  async returnViewUserById(id: string): Promise<UsersViewType | null> {
-    const userDb: UsersMainType | null = await this.usersModel.findOne({
-      id: new ObjectId(id),
-    });
+  async returnViewUserById(userId: string): Promise<UsersViewType | null> {
+    const userDb: UsersMainType | null = await this.usersModel.findById(
+      new ObjectId(userId),
+    );
 
     if (!userDb) return null;
 
