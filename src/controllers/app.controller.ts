@@ -2,6 +2,8 @@ import { Controller, Delete, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { AppService } from '../services/app.service';
 import { BlogsRepository } from '../repositories/blogs.repository';
 import { PostsRepository } from '../repositories/posts.repository';
+import { UsersRepository } from '../repositories/users.repository';
+import { CommentsRepository } from '../repositories/comments.repository';
 
 @Controller()
 export class AppController {
@@ -9,6 +11,8 @@ export class AppController {
     private readonly appService: AppService,
     private readonly blogsRepository: BlogsRepository,
     private readonly postsRepository: PostsRepository,
+    private readonly usersRepository: UsersRepository,
+    private readonly commentsRepository: CommentsRepository,
   ) {}
 
   @Get()
@@ -20,5 +24,7 @@ export class AppController {
   async deleteAll() {
     await this.blogsRepository.deleteAllBlogs();
     await this.postsRepository.deleteAllPosts();
+    await this.usersRepository.deleteAllUsers();
+    await this.commentsRepository.deleteAllComments();
   }
 }

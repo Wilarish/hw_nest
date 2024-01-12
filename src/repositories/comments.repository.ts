@@ -16,4 +16,8 @@ export class CommentsRepository {
   async returnAllComments() {
     return this.commentsModel.find({}, { __v: 0 });
   }
+
+  async deleteAllComments() {
+    await this.commentsModel.deleteMany({});
+  }
 }
