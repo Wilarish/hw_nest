@@ -87,6 +87,11 @@ export class BlogsController {
 
   @Post(':id/posts')
   async createPostForBlog(@Param('id') blogId: string, @Body() dto: any) {
+    const blog: BlogsViewType | null =
+      await this.blogsQueryRepository.returnViewBlogById(blogId);
+
+    if (!blog) throw new HttpException('not found ', HttpStatus.NOT_FOUND);
+
     const new_postId: string | null = await this.postsService.createPost({
       title: dto.title,
       shortDescription: dto.shortDescription,
