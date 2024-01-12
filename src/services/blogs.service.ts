@@ -18,7 +18,7 @@ export class BlogsService {
       description: dto.description,
       websiteUrl: dto.websiteUrl,
       createdAt: new Date().toISOString(),
-      isMembership: true,
+      isMembership: false,
     };
 
     return this.blogsRepository.createSaveBlog(newBlog);
