@@ -9,7 +9,7 @@ import { CommentsService } from '../services/comments.service';
 import { CommentsQueryRepository } from '../repositories/query/comments.query.repository';
 import { CommentsViewType } from '../types/comments.types';
 
-@Controller()
+@Controller('comments')
 export class CommentsController {
   constructor(
     private commentsService: CommentsService,
