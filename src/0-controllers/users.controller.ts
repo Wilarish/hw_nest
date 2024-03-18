@@ -9,12 +9,16 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { UsersCreate, UsersViewType } from '../types/users.types';
+import { UsersViewType } from '../5-dtos/users.types';
 import { UsersQueryRepository } from '../repositories/query/users.query.repository';
-import { Paginated, UsersPaginationType } from '../types/pagination.types';
-import { getUsersPagination } from '../helpers/pagination.helpers';
-import { UsersService } from '../services/users.service';
+import { Paginated, UsersPaginationType } from '../5-dtos/pagination.types';
+import { getUsersPagination } from '../6-helpers/pagination.helpers';
+import { UsersService } from '../1-services/users.service';
+import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
+import { BasicAuthGuard } from '../7-config/guards/basic.auth.guard';
+import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
 
 @Controller('users')
 export class UsersController {
@@ -32,7 +36,8 @@ export class UsersController {
   }
 
   @Post()
-  async createUser(@Body() dto: UsersCreate) {
+  @UseGuards(BasicAuthGuard)
+  async createUser(@Body() dto: UsersCreateValid) {
     const idOfCreatedUser: string | null =
       await this.usersService.createUser(dto);
 
@@ -51,7 +56,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(204)
-  async deleteUser(@Param('id') userId: string) {
+  async deleteUser(@Param('id', CustomObjectIdValidationPipe) userId: string) {
     const deleteResult: boolean = await this.usersService.deleteUser(userId);
 
     if (!deleteResult)

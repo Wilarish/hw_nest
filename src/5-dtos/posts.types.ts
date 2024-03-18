@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { ExtendedLikesPostsView } from './likes.types';
+import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
 
 export type PostsViewType = {
   id: ObjectId;
@@ -22,13 +23,6 @@ export type PostsMainType = {
   createdAt: string;
 };
 
-export type PostsCreateUpdate = {
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: ObjectId;
-};
-
-export type PostsCreateUpdateWith_id = PostsCreateUpdate & {
+export type PostsCreateUpdateWith_id = PostsCreateUpdateValidate & {
   _id: ObjectId;
 };

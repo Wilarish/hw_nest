@@ -18,12 +18,6 @@ export type BlogsViewType = {
   isMembership: boolean;
 };
 
-export type BlogsCreateUpdate = {
-  name: string;
-  description: string;
-  websiteUrl: string;
-};
-
 export type BlogsCreateUpdateWith_id = {
   _id: string;
   name: string;

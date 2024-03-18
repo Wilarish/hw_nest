@@ -11,13 +11,15 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { PostsCreateUpdate, PostsViewType } from '../types/posts.types';
-import { PostsService } from '../services/posts.service';
+import { PostsViewType } from '../5-dtos/posts.types';
+import { PostsService } from '../1-services/posts.service';
 import { PostsQueryRepository } from '../repositories/query/posts.query.repository';
-import { getDefaultPagination } from '../helpers/pagination.helpers';
-import { DefaultPaginationType, Paginated } from '../types/pagination.types';
-import { CommentsViewType } from '../types/comments.types';
+import { getDefaultPagination } from '../6-helpers/pagination.helpers';
+import { DefaultPaginationType, Paginated } from '../5-dtos/pagination.types';
+import { CommentsViewType } from '../5-dtos/comments.types';
 import { CommentsQueryRepository } from '../repositories/query/comments.query.repository';
+import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
+import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -39,7 +41,7 @@ export class PostsController {
   }
 
   @Get(':id')
-  async getPostById(@Param('id') postId: string) {
+  async getPostById(@Param('id', CustomObjectIdValidationPipe) postId: string) {
     const foundPost: PostsViewType | null =
       await this.postsQueryRepository.returnViewPostById(postId);
     if (!foundPost)
@@ -48,7 +50,7 @@ export class PostsController {
   }
   @Get(':id/comments')
   async getAllCommentsForPost(
-    @Param('id') postId: string,
+    @Param('id', CustomObjectIdValidationPipe) postId: string,
     @Query() params: any,
   ) {
     const pagination: DefaultPaginationType = getDefaultPagination(params);
@@ -66,7 +68,7 @@ export class PostsController {
   }
 
   @Post()
-  async createPost(@Body() dto: PostsCreateUpdate) {
+  async createPost(@Body() dto: PostsCreateUpdateValidate) {
     const new_postId: string | null = await this.postsService.createPost(dto);
     if (!new_postId)
       throw new HttpException('500 error', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,8 +82,8 @@ export class PostsController {
   @Put(':id')
   @HttpCode(204)
   async updatePost(
-    @Body() dto: PostsCreateUpdate,
-    @Param('id') postId: string,
+    @Body() dto: PostsCreateUpdateValidate,
+    @Param('id', CustomObjectIdValidationPipe) postId: string,
   ) {
     const new_post: PostsViewType | null =
       await this.postsQueryRepository.returnViewPostById(postId.toString());
@@ -96,7 +98,7 @@ export class PostsController {
 
   @Delete(':id')
   @HttpCode(204)
-  async deletePost(@Param('id') postId: string) {
+  async deletePost(@Param('id', CustomObjectIdValidationPipe) postId: string) {
     const deleteResult: boolean = await this.postsService.deletePost(postId);
 
     if (!deleteResult)

@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import {
   CommentsMainClass,
   CommentsModelType,
-} from '../schemas/comments.schema';
+} from '../3-schemas/comments.schema';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()

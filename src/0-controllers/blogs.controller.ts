@@ -11,18 +11,21 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { BlogsService } from '../services/blogs.service';
-import { BlogsCreateUpdate, BlogsViewType } from '../types/blog.types';
+import { BlogsService } from '../1-services/blogs.service';
+import { BlogsViewType } from '../5-dtos/blog.types';
 import { BlogsQueryRepository } from '../repositories/query/blogs.query.repository';
 import {
   getBlogsPagination,
   getDefaultPagination,
-} from '../helpers/pagination.helpers';
-import { BlogsPaginationType, Paginated } from '../types/pagination.types';
-import { PostsCreateUpdate, PostsViewType } from '../types/posts.types';
-import { PostsService } from '../services/posts.service';
+} from '../6-helpers/pagination.helpers';
+import { BlogsPaginationType, Paginated } from '../5-dtos/pagination.types';
+import { PostsViewType } from '../5-dtos/posts.types';
+import { PostsService } from '../1-services/posts.service';
 import { PostsQueryRepository } from '../repositories/query/posts.query.repository';
 import { ObjectId } from 'mongodb';
+import { BlogsCreateUpdateValid } from '../7-config/validation-pipes/blogs.pipes';
+import { PostsCreateInBlogsControllerValidate } from '../7-config/validation-pipes/posts.pipes';
+import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
 
 @Controller('blogs')
 export class BlogsController {
@@ -42,7 +45,7 @@ export class BlogsController {
   }
 
   @Get(':id')
-  async getBlogById(@Param('id') blogId: string) {
+  async getBlogById(@Param('id', CustomObjectIdValidationPipe) blogId: string) {
     const blog: BlogsViewType | null =
       await this.blogsQueryRepository.returnViewBlogById(blogId);
 
@@ -51,7 +54,10 @@ export class BlogsController {
     return blog;
   }
   @Get(':id/posts')
-  async getAllPostsForBlogs(@Param('id') blogId: string, @Query() params: any) {
+  async getAllPostsForBlogs(
+    @Param('id', CustomObjectIdValidationPipe) blogId: string,
+    @Query() params: any,
+  ) {
     const blog: BlogsViewType | null =
       await this.blogsQueryRepository.returnViewBlogById(blogId);
     if (!blog) throw new HttpException('404 not found', HttpStatus.NOT_FOUND);
@@ -66,7 +72,7 @@ export class BlogsController {
   }
 
   @Post()
-  async createBlog(@Body() dto: BlogsCreateUpdate) {
+  async createBlog(@Body() dto: BlogsCreateUpdateValid) {
     const idOfCreationBlog: string | null =
       await this.blogsService.createBlog(dto);
 
@@ -86,7 +92,10 @@ export class BlogsController {
   }
 
   @Post(':id/posts')
-  async createPostForBlog(@Param('id') blogId: string, @Body() dto: any) {
+  async createPostForBlog(
+    @Param('id', CustomObjectIdValidationPipe) blogId: string,
+    @Body() dto: PostsCreateInBlogsControllerValidate,
+  ) {
     const blog: BlogsViewType | null =
       await this.blogsQueryRepository.returnViewBlogById(blogId);
 
@@ -110,8 +119,8 @@ export class BlogsController {
   @Put(':id')
   @HttpCode(204)
   async changeBlog(
-    @Param('id') blogId: string,
-    @Body() dto: BlogsCreateUpdate,
+    @Param('id', CustomObjectIdValidationPipe) blogId: string,
+    @Body() dto: BlogsCreateUpdateValid,
   ) {
     const foundBlog: BlogsViewType | null =
       await this.blogsQueryRepository.returnViewBlogById(blogId);
@@ -127,7 +136,7 @@ export class BlogsController {
 
   @Delete(':id')
   @HttpCode(204)
-  async deleteBlog(@Param('id') blogId: string) {
+  async deleteBlog(@Param('id', CustomObjectIdValidationPipe) blogId: string) {
     const deleteResult: boolean = await this.blogsService.deleteBlog(blogId);
 
     if (!deleteResult)

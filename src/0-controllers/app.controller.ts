@@ -1,5 +1,5 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus } from '@nestjs/common';
-import { AppService } from '../services/app.service';
+import { Controller, Delete, Get, HttpCode } from '@nestjs/common';
+import { AppService } from '../1-services/app.service';
 import { BlogsRepository } from '../repositories/blogs.repository';
 import { PostsRepository } from '../repositories/posts.repository';
 import { UsersRepository } from '../repositories/users.repository';

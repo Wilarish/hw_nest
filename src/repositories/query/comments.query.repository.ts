@@ -3,12 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   CommentsMainClass,
   CommentsModelType,
-} from '../../schemas/comments.schema';
-import { likeStatuses } from '../../types/likes.types';
-import { CommentsViewType } from '../../types/comments.types';
+} from '../../3-schemas/comments.schema';
+import { likeStatuses } from '../../5-dtos/likes.types';
+import { CommentsViewType } from '../../5-dtos/comments.types';
 import { ObjectId } from 'mongodb';
-import { DefaultPaginationType, Paginated } from '../../types/pagination.types';
-import { PostsViewType } from '../../types/posts.types';
+import {
+  DefaultPaginationType,
+  Paginated,
+} from '../../5-dtos/pagination.types';
+import { PostsViewType } from '../../5-dtos/posts.types';
 import { PostsQueryRepository } from './posts.query.repository';
 
 @Injectable()

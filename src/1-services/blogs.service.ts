@@ -1,17 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from '../repositories/blogs.repository';
 import { ObjectId } from 'mongodb';
-import {
-  BlogsCreateUpdate,
-  BlogsCreateUpdateWith_id,
-  BlogsMainType,
-} from '../types/blog.types';
+import { BlogsCreateUpdateWith_id, BlogsMainType } from '../5-dtos/blog.types';
+import { BlogsCreateUpdateValid } from '../7-config/validation-pipes/blogs.pipes';
 
 @Injectable()
 export class BlogsService {
   constructor(private blogsRepository: BlogsRepository) {}
 
-  async createBlog(dto: BlogsCreateUpdate): Promise<string | null> {
+  async createBlog(dto: BlogsCreateUpdateValid): Promise<string | null> {
     const newBlog: BlogsMainType = {
       _id: new ObjectId(),
       name: dto.name,
@@ -24,7 +21,10 @@ export class BlogsService {
     return this.blogsRepository.createSaveBlog(newBlog);
   }
 
-  async updateBlog(blogId: string, dto: BlogsCreateUpdate): Promise<boolean> {
+  async updateBlog(
+    blogId: string,
+    dto: BlogsCreateUpdateValid,
+  ): Promise<boolean> {
     const newBlogDto: BlogsCreateUpdateWith_id = {
       _id: blogId,
       name: dto.name,

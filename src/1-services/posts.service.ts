@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import {
-  PostsCreateUpdate,
-  PostsCreateUpdateWith_id,
-  PostsMainType,
-} from '../types/posts.types';
+import { PostsCreateUpdateWith_id, PostsMainType } from '../5-dtos/posts.types';
 import { PostsRepository } from '../repositories/posts.repository';
 import { ObjectId } from 'mongodb';
 import { BlogsRepository } from '../repositories/blogs.repository';
+import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
 
 @Injectable()
 export class PostsService {
@@ -15,7 +12,7 @@ export class PostsService {
     private blogsRepository: BlogsRepository,
   ) {}
 
-  async createPost(postDto: PostsCreateUpdate): Promise<string | null> {
+  async createPost(postDto: PostsCreateUpdateValidate): Promise<string | null> {
     const foundBlog = await this.blogsRepository.findBlogById(
       postDto.blogId.toString(),
     );
@@ -35,7 +32,10 @@ export class PostsService {
     return this.postsRepository.createSavePost(post);
   }
 
-  async updatePost(postId: string, dto: PostsCreateUpdate): Promise<boolean> {
+  async updatePost(
+    postId: string,
+    dto: PostsCreateUpdateValidate,
+  ): Promise<boolean> {
     const newPostDto: PostsCreateUpdateWith_id = {
       _id: new ObjectId(postId),
       title: dto.title,

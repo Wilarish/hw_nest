@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { UsersCreate, UsersMainType } from '../types/users.types';
-import { BcryptAdapter } from '../adapters/bcrypt.adapter';
+import { UsersMainType } from '../5-dtos/users.types';
+import { BcryptAdapter } from '../4-adapters/bcrypt.adapter';
 import { ObjectId } from 'mongodb';
 import { UsersRepository } from '../repositories/users.repository';
+import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
 
 @Injectable()
 export class UsersService {
@@ -10,7 +11,7 @@ export class UsersService {
     private hashAdapter: BcryptAdapter,
     private usersRepository: UsersRepository,
   ) {}
-  async createUser(dto: UsersCreate): Promise<string | null> {
+  async createUser(dto: UsersCreateValid): Promise<string | null> {
     const passInfo = await this.hashAdapter.passwordHash();
 
     const user: UsersMainType = {

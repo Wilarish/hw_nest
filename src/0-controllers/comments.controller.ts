@@ -5,9 +5,10 @@ import {
   HttpStatus,
   Param,
 } from '@nestjs/common';
-import { CommentsService } from '../services/comments.service';
+import { CommentsService } from '../1-services/comments.service';
 import { CommentsQueryRepository } from '../repositories/query/comments.query.repository';
-import { CommentsViewType } from '../types/comments.types';
+import { CommentsViewType } from '../5-dtos/comments.types';
+import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
 
 @Controller('comments')
 export class CommentsController {
@@ -16,7 +17,9 @@ export class CommentsController {
     private commentsQueryRepository: CommentsQueryRepository,
   ) {}
   @Get(':id')
-  async getCommentById(@Param('id') blogId: string) {
+  async getCommentById(
+    @Param('id', CustomObjectIdValidationPipe) blogId: string,
+  ) {
     const comment: CommentsViewType | null =
       await this.commentsQueryRepository.returnCommentById(blogId);
     if (!comment) throw new HttpException('error 404', HttpStatus.NOT_FOUND);

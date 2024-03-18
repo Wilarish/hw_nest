@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UsersMainClass, UsersModelType } from '../schemas/users.scema';
-import { UsersMainType } from '../types/users.types';
+import { UsersMainClass, UsersModelType } from '../3-schemas/users.scema';
+import { UsersMainType } from '../5-dtos/users.types';
 import { ObjectId } from 'mongodb';
 
 @Injectable()
@@ -10,6 +10,13 @@ export class UsersRepository {
     @InjectModel(UsersMainClass.name) private usersModel: UsersModelType,
   ) {}
 
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UsersMainType | null> {
+    return this.usersModel.findOne({
+      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+    });
+  }
   async createSaveUser(user: UsersMainType): Promise<string | null> {
     return this.usersModel.createSaveUser(user, this.usersModel);
   }

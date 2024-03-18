@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BlogsCreateUpdateWith_id, BlogsMainType } from '../types/blog.types';
+import { BlogsCreateUpdateWith_id, BlogsMainType } from '../5-dtos/blog.types';
 import { Model } from 'mongoose';
 
 @Schema()

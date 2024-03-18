@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { BlogsCreateUpdateWith_id } from '../types/blog.types';
+import { BlogsCreateUpdateWith_id } from '../5-dtos/blog.types';
 import { Model } from 'mongoose';
-import { PostsCreateUpdateWith_id, PostsMainType } from '../types/posts.types';
+import { PostsCreateUpdateWith_id, PostsMainType } from '../5-dtos/posts.types';
 
 @Schema()
 export class PostsMainClass {

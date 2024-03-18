@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
-import { UsersMainClass, UsersModelType } from '../../schemas/users.scema';
-import { Paginated, UsersPaginationType } from '../../types/pagination.types';
-import { UsersMainType, UsersViewType } from '../../types/users.types';
+import { UsersMainClass, UsersModelType } from '../../3-schemas/users.scema';
+import { Paginated, UsersPaginationType } from '../../5-dtos/pagination.types';
+import { UsersMainType, UsersViewType } from '../../5-dtos/users.types';
 import { ObjectId } from 'mongodb';
 
 @Injectable()

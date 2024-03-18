@@ -1,15 +1,15 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { BlogsMainClass, BlogsModelType } from '../../schemas/blogs.schema';
+import { BlogsMainClass, BlogsModelType } from '../../3-schemas/blogs.schema';
 import { ObjectId } from 'mongodb';
-import { BlogsViewType } from '../../types/blog.types';
+import { BlogsViewType } from '../../5-dtos/blog.types';
 import {
   BlogsPaginationType,
   DefaultPaginationType,
   Paginated,
-} from '../../types/pagination.types';
-import { PostsViewType } from '../../types/posts.types';
-import { PostsMainClass, PostsModelType } from '../../schemas/posts.schema';
-import { likeStatuses } from '../../types/likes.types';
+} from '../../5-dtos/pagination.types';
+import { PostsViewType } from '../../5-dtos/posts.types';
+import { PostsMainClass, PostsModelType } from '../../3-schemas/posts.schema';
+import { likeStatuses } from '../../5-dtos/likes.types';
 
 export class BlogsQueryRepository {
   constructor(

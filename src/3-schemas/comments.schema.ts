@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { CommentsMainType } from '../types/comments.types';
+import { CommentsMainType } from '../5-dtos/comments.types';
 import { Model } from 'mongoose';
 
 @Schema()

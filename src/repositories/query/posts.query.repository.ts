@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 
 import { ObjectId } from 'mongodb';
 import { InjectModel } from '@nestjs/mongoose';
-import { PostsMainClass, PostsModelType } from '../../schemas/posts.schema';
-import { PostsViewType } from '../../types/posts.types';
-import { likeStatuses } from '../../types/likes.types';
-import { DefaultPaginationType, Paginated } from '../../types/pagination.types';
+import { PostsMainClass, PostsModelType } from '../../3-schemas/posts.schema';
+import { PostsViewType } from '../../5-dtos/posts.types';
+import { likeStatuses } from '../../5-dtos/likes.types';
+import {
+  DefaultPaginationType,
+  Paginated,
+} from '../../5-dtos/pagination.types';
 
 @Injectable()
 export class PostsQueryRepository {

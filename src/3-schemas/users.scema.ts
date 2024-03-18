@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { UsersMainType } from '../types/users.types';
+import { UsersMainType } from '../5-dtos/users.types';
 import { Model } from 'mongoose';
 
 @Schema({ _id: false })

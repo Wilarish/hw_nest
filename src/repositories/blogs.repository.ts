@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { InjectModel } from '@nestjs/mongoose';
-import { BlogsMainClass, BlogsModelType } from '../schemas/blogs.schema';
-import { BlogsCreateUpdateWith_id, BlogsMainType } from '../types/blog.types';
-import { PostsMainClass, PostsModelType } from '../schemas/posts.schema';
+import { BlogsMainClass, BlogsModelType } from '../3-schemas/blogs.schema';
+import { BlogsCreateUpdateWith_id, BlogsMainType } from '../5-dtos/blog.types';
+import { PostsMainClass, PostsModelType } from '../3-schemas/posts.schema';
 
 @Injectable()
 export class BlogsRepository {

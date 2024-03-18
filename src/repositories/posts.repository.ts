@@ -1,6 +1,6 @@
-import { PostsCreateUpdateWith_id, PostsMainType } from '../types/posts.types';
+import { PostsCreateUpdateWith_id, PostsMainType } from '../5-dtos/posts.types';
 import { InjectModel } from '@nestjs/mongoose';
-import { PostsMainClass, PostsModelType } from '../schemas/posts.schema';
+import { PostsMainClass, PostsModelType } from '../3-schemas/posts.schema';
 import { ObjectId } from 'mongodb';
 
 export class PostsRepository {

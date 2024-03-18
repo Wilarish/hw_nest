@@ -3,7 +3,7 @@ import {
   DefaultPaginationType,
   SortDirectionEnum,
   UsersPaginationType,
-} from '../types/pagination.types';
+} from '../5-dtos/pagination.types';
 
 export const getDefaultPagination = (query: any): DefaultPaginationType => {
   const defaultValues: DefaultPaginationType = {
