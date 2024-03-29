@@ -51,8 +51,6 @@ export class UsersMainClass {
     newUser.createdAt = user.createdAt;
     newUser.emailConfirmation = user.emailConfirmation;
 
-    // const result = await newBlog.save();
-    // return result.
     try {
       await newUser.save();
       return newUser._id.toString();

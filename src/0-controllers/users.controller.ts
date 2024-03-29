@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersViewType } from '../5-dtos/users.types';
-import { UsersQueryRepository } from '../repositories/query/users.query.repository';
+import { UsersQueryRepository } from '../2-repositories/query/users.query.repository';
 import { Paginated, UsersPaginationType } from '../5-dtos/pagination.types';
 import { getUsersPagination } from '../6-helpers/pagination.helpers';
 import { UsersService } from '../1-services/users.service';

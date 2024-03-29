@@ -6,7 +6,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { CommentsService } from '../1-services/comments.service';
-import { CommentsQueryRepository } from '../repositories/query/comments.query.repository';
+import { CommentsQueryRepository } from '../2-repositories/query/comments.query.repository';
 import { CommentsViewType } from '../5-dtos/comments.types';
 import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
 

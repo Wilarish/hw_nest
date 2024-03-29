@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PostsCreateUpdateWith_id, PostsMainType } from '../5-dtos/posts.types';
-import { PostsRepository } from '../repositories/posts.repository';
+import { PostsRepository } from '../2-repositories/posts.repository';
 import { ObjectId } from 'mongodb';
-import { BlogsRepository } from '../repositories/blogs.repository';
+import { BlogsRepository } from '../2-repositories/blogs.repository';
 import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
 
 @Injectable()
@@ -24,7 +24,6 @@ export class PostsService {
       shortDescription: postDto.shortDescription,
       content: postDto.content,
       blogId: new ObjectId(postDto.blogId),
-      //blogId: postDto.blogId,
       blogName: foundBlog.name,
       createdAt: new Date().toISOString(),
     };

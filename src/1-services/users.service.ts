@@ -2,17 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { UsersMainType } from '../5-dtos/users.types';
 import { BcryptAdapter } from '../4-adapters/bcrypt.adapter';
 import { ObjectId } from 'mongodb';
-import { UsersRepository } from '../repositories/users.repository';
+import { UsersRepository } from '../2-repositories/users.repository';
 import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private hashAdapter: BcryptAdapter,
+    private bcryptAdapter: BcryptAdapter,
     private usersRepository: UsersRepository,
   ) {}
   async createUser(dto: UsersCreateValid): Promise<string | null> {
-    const passInfo = await this.hashAdapter.passwordHash();
+    const passInfo = await this.bcryptAdapter.passwordHash(dto.password);
 
     const user: UsersMainType = {
       _id: new ObjectId(),

@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { BlogsService } from '../1-services/blogs.service';
 import { BlogsViewType } from '../5-dtos/blog.types';
-import { BlogsQueryRepository } from '../repositories/query/blogs.query.repository';
+import { BlogsQueryRepository } from '../2-repositories/query/blogs.query.repository';
 import {
   getBlogsPagination,
   getDefaultPagination,
@@ -21,7 +21,7 @@ import {
 import { BlogsPaginationType, Paginated } from '../5-dtos/pagination.types';
 import { PostsViewType } from '../5-dtos/posts.types';
 import { PostsService } from '../1-services/posts.service';
-import { PostsQueryRepository } from '../repositories/query/posts.query.repository';
+import { PostsQueryRepository } from '../2-repositories/query/posts.query.repository';
 import { ObjectId } from 'mongodb';
 import { BlogsCreateUpdateValid } from '../7-config/validation-pipes/blogs.pipes';
 import { PostsCreateInBlogsControllerValidate } from '../7-config/validation-pipes/posts.pipes';

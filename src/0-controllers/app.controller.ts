@@ -1,9 +1,9 @@
 import { Controller, Delete, Get, HttpCode } from '@nestjs/common';
 import { AppService } from '../1-services/app.service';
-import { BlogsRepository } from '../repositories/blogs.repository';
-import { PostsRepository } from '../repositories/posts.repository';
-import { UsersRepository } from '../repositories/users.repository';
-import { CommentsRepository } from '../repositories/comments.repository';
+import { BlogsRepository } from '../2-repositories/blogs.repository';
+import { PostsRepository } from '../2-repositories/posts.repository';
+import { UsersRepository } from '../2-repositories/users.repository';
+import { CommentsRepository } from '../2-repositories/comments.repository';
 
 @Controller()
 export class AppController {

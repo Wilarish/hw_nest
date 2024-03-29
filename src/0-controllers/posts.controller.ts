@@ -13,11 +13,11 @@ import {
 } from '@nestjs/common';
 import { PostsViewType } from '../5-dtos/posts.types';
 import { PostsService } from '../1-services/posts.service';
-import { PostsQueryRepository } from '../repositories/query/posts.query.repository';
+import { PostsQueryRepository } from '../2-repositories/query/posts.query.repository';
 import { getDefaultPagination } from '../6-helpers/pagination.helpers';
 import { DefaultPaginationType, Paginated } from '../5-dtos/pagination.types';
 import { CommentsViewType } from '../5-dtos/comments.types';
-import { CommentsQueryRepository } from '../repositories/query/comments.query.repository';
+import { CommentsQueryRepository } from '../2-repositories/query/comments.query.repository';
 import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
 import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
 

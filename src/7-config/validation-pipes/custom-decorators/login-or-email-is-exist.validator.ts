@@ -5,7 +5,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../../../repositories/users.repository';
+import { UsersRepository } from '../../../2-repositories/users.repository';
 import { UsersMainType } from '../../../5-dtos/users.types';
 
 @ValidatorConstraint({ name: 'LoginOrEmailIsAlreadyExist', async: true })

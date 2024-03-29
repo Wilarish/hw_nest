@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BlogsRepository } from '../repositories/blogs.repository';
+import { BlogsRepository } from '../2-repositories/blogs.repository';
 import { ObjectId } from 'mongodb';
 import { BlogsCreateUpdateWith_id, BlogsMainType } from '../5-dtos/blog.types';
 import { BlogsCreateUpdateValid } from '../7-config/validation-pipes/blogs.pipes';
