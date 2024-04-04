@@ -31,6 +31,10 @@ import { AuthController } from './0-controllers/auth.controller';
 import { EmailServices } from './1-services/email-service';
 import { emailAdapter } from './4-adapters/email.adapter';
 import { AuthServices } from './1-services/auth.services';
+import { JwtAdapter } from './4-adapters/jwt.adapter';
+import { DevicesServices } from './1-services/devices.services';
+import { DevicesRepository } from './2-repositories/devices.repository';
+import { DeviceSchema, DevicesMainClass } from './3-schemas/devices.schema';
 
 @Module({
   imports: [
@@ -52,11 +56,15 @@ import { AuthServices } from './1-services/auth.services';
         name: CommentsMainClass.name,
         schema: CommentsSchema,
       },
+      {
+        name: DevicesMainClass.name,
+        schema: DeviceSchema,
+      },
     ]),
     JwtModule.register({
       global: true,
       secret: 'qwerty',
-      signOptions: { expiresIn: '5m' },
+      signOptions: { expiresIn: '5s' },
     }),
   ],
   controllers: [
@@ -78,11 +86,13 @@ import { AuthServices } from './1-services/auth.services';
     UsersService,
     EmailServices,
     AuthServices,
+    DevicesServices,
 
     UsersQueryRepository,
     BlogsQueryRepository,
     PostsQueryRepository,
     CommentsQueryRepository,
+    DevicesRepository,
 
     CommentsRepository,
     PostsRepository,
@@ -91,6 +101,7 @@ import { AuthServices } from './1-services/auth.services';
 
     BcryptAdapter,
     emailAdapter,
+    JwtAdapter,
   ],
 })
 export class AppModule {}

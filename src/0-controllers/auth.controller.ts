@@ -4,27 +4,90 @@ import {
   Controller,
   Get,
   HttpCode,
-  HttpStatus,
   InternalServerErrorException,
   Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
-import { EmailServices } from '../1-services/email-service';
 import { AuthServices } from '../1-services/auth.services';
 import { UsersRepository } from '../2-repositories/users.repository';
-import { ObjectId } from 'mongodb';
+import {
+  AuthUUIDCodeValid,
+  AuthEmailValid,
+  AuthNewPassValid,
+  AuthLoginValid,
+} from '../7-config/validation-pipes/auth.pipes';
+import { Request, Response } from 'express';
+import { DevicesRepository } from '../2-repositories/devices.repository';
+import { JwtRefreshTokenAuthGuard } from '../7-config/guards/refresh.token.auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authServices: AuthServices,
-    private emailServices: EmailServices,
     private usersRepository: UsersRepository,
+    private deviceRepository: DevicesRepository,
   ) {}
   @Get()
   async Test(@Body() dto: any) {
-    return this.usersRepository.findUserById(dto._id);
+    return this.deviceRepository.findDeviceById(dto.deviceId);
   }
+  @Post('refresh-token')
+  @UseGuards(JwtRefreshTokenAuthGuard)
+  @HttpCode(200)
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authServices.changeTokensAndDevices(
+      req.cookies.refreshToken,
+    );
+    if (!result) {
+      throw new BadRequestException();
+    }
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    return {
+      accessToken: result.accessToken,
+    };
+  }
+
+  @Post('login')
+  @HttpCode(200)
+  async login(
+    @Body() dto: AuthLoginValid,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const userIp: string =
+      req.headers['x-forwarded-for']?.toString() ||
+      [req.socket.remoteAddress].toString();
+    const title: string | undefined = req.headers['user-agent']!.toString();
+
+    const loginResult = await this.authServices.login(
+      dto.loginOrEmail,
+      dto.password,
+      userIp,
+      title,
+    );
+
+    if (!loginResult) {
+      throw new UnauthorizedException();
+    }
+    res.cookie('refreshToken', loginResult.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    return {
+      accessToken: loginResult.accessToken,
+    };
+  }
+
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() dto: UsersCreateValid) {
@@ -36,7 +99,7 @@ export class AuthController {
   }
   @Post('registration-confirmation')
   @HttpCode(204)
-  async registrationConfirmation(@Body() dto: { code: string }) {
+  async registrationConfirmation(@Body() dto: AuthUUIDCodeValid) {
     const confirmResult: boolean = await this.authServices.confirmEmail(
       dto!.code,
     );
@@ -48,7 +111,7 @@ export class AuthController {
 
   @Post('registration-email-resending')
   @HttpCode(204)
-  async registrationEmailResending(@Body() dto: { email: string }) {
+  async registrationEmailResending(@Body() dto: AuthEmailValid) {
     const resendResult: boolean = await this.authServices.resendCode(dto.email);
     if (!resendResult) {
       throw new BadRequestException();
@@ -58,7 +121,7 @@ export class AuthController {
 
   @Post('password-recovery')
   @HttpCode(204)
-  async passwordRecovery(@Body() dto: { email: string }) {
+  async passwordRecovery(@Body() dto: AuthEmailValid) {
     await this.authServices.refreshPassword(dto.email);
 
     return;
@@ -66,9 +129,7 @@ export class AuthController {
 
   @Post('new-password')
   @HttpCode(204)
-  async newPassword(
-    @Body() dto: { newPassword: string; recoveryCode: string },
-  ) {
+  async newPassword(@Body() dto: AuthNewPassValid) {
     const result: boolean = await this.authServices.setNewPassword(
       dto.newPassword,
       dto.recoveryCode,

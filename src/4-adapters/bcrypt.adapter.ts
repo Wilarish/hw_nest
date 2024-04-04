@@ -6,8 +6,6 @@ export class BcryptAdapter {
   async passwordHash(
     password: string,
   ): Promise<{ passwordSalt; passwordHash }> {
-    //const password: string = process.env.PASSWORD_HASH_KEY || '12345';
-
     const passwordSalt: string = await bcrypt.genSalt(10);
     const passwordHash: string = await bcrypt.hash(password, passwordSalt);
 
@@ -15,5 +13,12 @@ export class BcryptAdapter {
       passwordSalt,
       passwordHash,
     };
+  }
+
+  async passwordHashWithoutSalt(
+    password: string,
+    salt: string,
+  ): Promise<string> {
+    return bcrypt.hash(password, salt);
   }
 }

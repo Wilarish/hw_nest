@@ -13,3 +13,7 @@ export type DeviceViewType = {
   lastActiveDate: string;
   deviceId: string;
 };
+export type DeviceUpdateType = {
+  lastActiveDate: string;
+  deviceId: string;
+};

@@ -1,66 +1,58 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { BlogsCreateUpdateWith_id, BlogsMainType } from '../5-dtos/blog.types';
 import { Model } from 'mongoose';
-import { DeviceMainType } from '../5-dtos/devices.types';
+import { DeviceMainType, DeviceUpdateType } from '../5-dtos/devices.types';
 
 @Schema()
 export class DevicesMainClass {
   @Prop({ required: true })
-  _id: ObjectId;
+  ip: string;
 
   @Prop({ required: true })
-  name: string;
+  deviceId: string;
 
   @Prop({ required: true })
-  description: string;
+  title: string;
 
   @Prop({ required: true })
-  websiteUrl: string;
+  lastActiveDate: string;
 
   @Prop({ required: true })
-  createdAt: string;
-
-  @Prop({ required: true })
-  isMembership: boolean;
+  userId: ObjectId;
 
   static async createSaveDevice(
-    blog: BlogsMainType,
+    device: DeviceMainType,
     model: Model<DevicesMainClass>,
-  ): Promise<string | null> {
-    const newBlog = new model();
+  ): Promise<boolean> {
+    const newDevice = new model();
 
-    newBlog._id = blog._id;
-    newBlog.name = blog.name;
-    newBlog.description = blog.description;
-    newBlog.websiteUrl = blog.websiteUrl;
-    newBlog.createdAt = blog.createdAt;
-    newBlog.isMembership = blog.isMembership;
+    newDevice.ip = device.ip;
+    newDevice.deviceId = device.deviceId;
+    newDevice.title = device.title;
+    newDevice.lastActiveDate = device.lastActiveDate;
+    newDevice.userId = device.userId;
 
-    // const result = await newBlog.save();
-    // return result.
     try {
-      await newBlog.save();
-      return newBlog._id.toString();
+      await newDevice.save();
+      console.log(newDevice.deviceId);
+      return true;
     } catch (err) {
-      return null;
+      return false;
     }
   }
 
   static async updateSaveDevice(
-    blogDto: BlogsCreateUpdateWith_id,
+    deviceDto: DeviceUpdateType,
     model: Model<DevicesMainClass>,
   ): Promise<boolean> {
-    const dbBlog = await model.findById(new ObjectId(blogDto._id));
+    const dbDevice = await model.findOne({ deviceId: deviceDto.deviceId });
 
-    if (!dbBlog) return false;
+    if (!dbDevice) return false;
 
-    dbBlog.websiteUrl = blogDto.websiteUrl;
-    dbBlog.name = blogDto.name;
-    dbBlog.description = blogDto.description;
+    dbDevice.lastActiveDate = deviceDto.lastActiveDate;
 
     try {
-      await dbBlog.save();
+      await dbDevice.save();
       return true;
     } catch (err) {
       return false;
@@ -73,10 +65,10 @@ export interface DevicesModelStaticsType {
   createSaveDevice: (
     device: DeviceMainType,
     model: Model<DevicesMainClass>,
-  ) => Promise<string | null>;
+  ) => Promise<boolean>;
 
   updateSaveDevice: (
-    device: BlogsCreateUpdateWith_id,
+    deviceDto: DeviceUpdateType,
     model: Model<DevicesMainClass>,
   ) => Promise<boolean>;
 }

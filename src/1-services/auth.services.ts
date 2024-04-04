@@ -8,6 +8,9 @@ import { BcryptAdapter } from '../4-adapters/bcrypt.adapter';
 import { ObjectId } from 'mongodb';
 import { add } from 'date-fns';
 import { JwtService } from '@nestjs/jwt';
+import { JwtAdapter } from '../4-adapters/jwt.adapter';
+import { DeviceMainType } from '../5-dtos/devices.types';
+import { DevicesServices } from './devices.services';
 
 @Injectable()
 export class AuthServices {
@@ -16,9 +19,70 @@ export class AuthServices {
     protected emailServices: EmailServices,
     private bcryptAdapter: BcryptAdapter,
     private jwtService: JwtService,
-    //protected deviceServices: DeviceServices,
+    private jwtAdapter: JwtAdapter,
+    private deviceServices: DevicesServices,
   ) {}
 
+  async login(
+    loginOrEmail: string,
+    password: string,
+    ip: string,
+    title: string,
+  ) {
+    const user: UsersMainType | null =
+      await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
+
+    if (!user) return null;
+    if (!user.emailConfirmation.isConfirmed) return null;
+
+    const hash: string = await this.bcryptAdapter.passwordHashWithoutSalt(
+      password,
+      user.passwordSalt,
+    );
+    if (hash !== user.passwordHash) return null;
+
+    return this.createTokensAndDevice(user._id.toString(), ip, title);
+  }
+
+  async createTokensAndDevice(userId: string, ip: string, title: string) {
+    const accessToken: string = await this.jwtAdapter.createAccessJwt(userId);
+    const refreshToken: string = await this.jwtAdapter.createRefreshJwt(
+      userId,
+      uuidv4(),
+    );
+    const decode: any = await this.jwtAdapter.getPayloadOfJwt(refreshToken);
+
+    const device: DeviceMainType = {
+      ip: ip,
+      title: title,
+      lastActiveDate: new Date(decode!.iat! * 1000).toISOString(),
+      deviceId: decode.deviceId?.toString(),
+      userId: new ObjectId(userId),
+    };
+    console.log('deviceId: ' + decode.deviceId.toString());
+
+    const addDevice: boolean = await this.deviceServices.addNewDevice(device);
+    if (!addDevice) return null;
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+  async changeTokensAndDevices(token: string) {
+    const result = await this.jwtAdapter.refreshToken(token);
+    if (!result) return null;
+
+    const change: boolean = await this.deviceServices.changeDevice(
+      result.refreshToken.payload.deviceId,
+      result.refreshToken.payload.iat,
+    );
+    if (!change) return null;
+    return {
+      refreshToken: result.refreshToken.token,
+      accessToken: result.accessToken,
+    };
+  }
   async createUser(data: UsersCreateValid): Promise<boolean> {
     const passwordInfo: { passwordSalt; passwordHash } =
       await this.bcryptAdapter.passwordHash(data.password);
@@ -93,9 +157,12 @@ export class AuthServices {
     if (!user) {
       return false;
     }
-    const recoveryCode: string = await this.jwtService.signAsync({
-      _id: user._id.toString(),
-    });
+    const recoveryCode: string = await this.jwtService.signAsync(
+      {
+        userid: user._id.toString(),
+      },
+      { expiresIn: '30m' },
+    );
     console.log(recoveryCode);
 
     await this.emailServices.SendEmailForRefreshPassword(email, recoveryCode);
@@ -115,7 +182,7 @@ export class AuthServices {
     const passInfo = await this.bcryptAdapter.passwordHash(newPassword);
 
     return this.usersRepository.changeHashAndSalt(
-      payload._id,
+      payload.userid,
       passInfo.passwordHash,
       passInfo.passwordSalt,
     );
