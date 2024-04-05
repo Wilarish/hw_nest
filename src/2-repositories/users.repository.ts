@@ -29,7 +29,7 @@ export class UsersRepository {
     });
     if (!result) return false;
 
-    return result._id.toString() === userId;
+    return true;
   }
 
   async deleteAllUsers() {

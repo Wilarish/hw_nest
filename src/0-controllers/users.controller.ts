@@ -65,5 +65,6 @@ export class UsersController {
     if (!deleteResult) {
       throw new NotFoundException();
     }
+    return;
   }
 }
