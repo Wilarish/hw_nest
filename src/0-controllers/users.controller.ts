@@ -10,7 +10,6 @@ import {
   Param,
   Post,
   Query,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { UsersViewType } from '../5-dtos/users.types';

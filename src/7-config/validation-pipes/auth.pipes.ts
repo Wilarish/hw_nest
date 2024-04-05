@@ -1,7 +1,9 @@
 import { IsEmail, IsJWT, IsString, Length } from 'class-validator';
 import { Trim } from './custom-decorators/trim';
+import { IsCodeIsAlreadyConfirmed } from './custom-decorators/is-email-code-is-already-confirmed';
 
 export class AuthUUIDCodeValid {
+  @IsCodeIsAlreadyConfirmed()
   @Length(20, 250)
   @Trim()
   @IsString()
