@@ -42,6 +42,8 @@ import {
   RateLimitSchema,
 } from './3-schemas/rate.limit.schema';
 import { IsCodeIsAlreadyConfirmedValidator } from './7-config/validation-pipes/custom-decorators/is-email-code-is-already-confirmed';
+import { IsThisEmailExistsValidator } from './7-config/validation-pipes/custom-decorators/is-email-exists';
+import { IsThisEmailConfirmedValidator } from './7-config/validation-pipes/custom-decorators/is-email-already-confirmed';
 
 @Module({
   imports: [
@@ -91,6 +93,8 @@ import { IsCodeIsAlreadyConfirmedValidator } from './7-config/validation-pipes/c
     LoginOrEmailIsAlreadyExistValidator,
     IsBlogExistValidator,
     IsCodeIsAlreadyConfirmedValidator,
+    IsThisEmailExistsValidator,
+    IsThisEmailConfirmedValidator,
 
     AppService,
     BlogsService,

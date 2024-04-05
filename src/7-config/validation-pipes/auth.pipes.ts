@@ -1,6 +1,8 @@
 import { IsEmail, IsJWT, IsString, Length } from 'class-validator';
 import { Trim } from './custom-decorators/trim';
 import { IsCodeIsAlreadyConfirmed } from './custom-decorators/is-email-code-is-already-confirmed';
+import { IsThisEmailExists } from './custom-decorators/is-email-exists';
+import { IsThisEmailConfirmed } from './custom-decorators/is-email-already-confirmed';
 
 export class AuthUUIDCodeValid {
   @IsCodeIsAlreadyConfirmed()
@@ -10,6 +12,8 @@ export class AuthUUIDCodeValid {
   code: string;
 }
 export class AuthEmailValid {
+  @IsThisEmailConfirmed()
+  @IsThisEmailExists()
   @Length(5, 100)
   @Trim()
   @IsEmail()
