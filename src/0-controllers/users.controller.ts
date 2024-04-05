@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Query,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { UsersViewType } from '../5-dtos/users.types';
@@ -59,7 +60,6 @@ export class UsersController {
   async deleteUser(@Param('id', CustomObjectIdValidationPipe) userId: string) {
     const deleteResult: boolean = await this.usersService.deleteUser(userId);
 
-    if (!deleteResult)
-      throw new HttpException('not found', HttpStatus.NOT_FOUND);
+    if (!deleteResult) throw new UnauthorizedException();
   }
 }
