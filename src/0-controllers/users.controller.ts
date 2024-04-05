@@ -56,6 +56,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async deleteUser(@Param('id', CustomObjectIdValidationPipe) userId: string) {
     const deleteResult: boolean = await this.usersService.deleteUser(userId);
