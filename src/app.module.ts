@@ -41,6 +41,7 @@ import {
   RateLimitMainClass,
   RateLimitSchema,
 } from './3-schemas/rate.limit.schema';
+import { IsCodeIsAlreadyConfirmedValidator } from './7-config/validation-pipes/custom-decorators/is-email-code-is-already-confirmed';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import {
   providers: [
     LoginOrEmailIsAlreadyExistValidator,
     IsBlogExistValidator,
+    IsCodeIsAlreadyConfirmedValidator,
 
     AppService,
     BlogsService,
