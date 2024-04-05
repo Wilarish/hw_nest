@@ -18,7 +18,9 @@ export class IsThisEmailExistsValidator
     const user: UsersMainType | null =
       await this.usersRepository.findUserByLoginOrEmail(email);
 
-    if (!user) return false;
+    if (!user) {
+      return false;
+    }
 
     return true;
   }

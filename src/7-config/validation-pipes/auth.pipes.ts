@@ -12,8 +12,8 @@ export class AuthUUIDCodeValid {
   code: string;
 }
 export class AuthEmailValid {
-  @IsThisEmailConfirmed()
   @IsThisEmailExists()
+  @IsThisEmailConfirmed()
   @Length(5, 100)
   @Trim()
   @IsEmail()
