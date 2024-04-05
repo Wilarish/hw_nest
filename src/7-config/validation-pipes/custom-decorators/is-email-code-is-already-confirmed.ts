@@ -27,7 +27,7 @@ export class IsCodeIsAlreadyConfirmedValidator
     return true;
   }
   defaultMessage(): string {
-    return 'user is already confirmed email';
+    return 'user is already confirmed email or code is incorrect';
   }
 }
 export function IsCodeIsAlreadyConfirmed(
