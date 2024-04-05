@@ -27,4 +27,21 @@ export class DevicesRepository {
   async changeDevice(deviceUpdate: DeviceUpdateType) {
     return this.deviceModel.updateSaveDevice(deviceUpdate, this.deviceModel);
   }
+
+  async deleteDevice(deviceId: string) {
+    const result = await this.deviceModel.findOneAndDelete({
+      deviceId: deviceId,
+    });
+    if (!result) return false;
+
+    return result.deviceId === deviceId;
+  }
+
+  async deleteAllOtherDevices(userId: string, deviceId: string) {
+    const result = await this.deviceModel.deleteMany({
+      userId: new ObjectId(userId),
+      deviceId: { $ne: deviceId },
+    });
+    return true;
+  }
 }

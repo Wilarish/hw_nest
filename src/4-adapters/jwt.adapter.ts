@@ -23,22 +23,32 @@ export class JwtAdapter {
   }
 
   async getPayloadOfJwt(token: string) {
-    return this.jwtService.verifyAsync(token, {
-      secret: 'qwerty',
-    });
+    try {
+      return this.jwtService.verifyAsync(token, {
+        secret: 'qwerty',
+      });
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
 
   async findUserByToken(refreshToken: string) {
-    const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: 'qwerty',
-    });
-    const user: UsersMainType | null = await this.userRepository.findUserById(
-      payload.userId,
-    );
-    if (!user) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: 'qwerty',
+      });
+      const user: UsersMainType | null = await this.userRepository.findUserById(
+        payload.userId,
+      );
+      if (!user) {
+        return null;
+      }
+      return payload;
+    } catch (err) {
+      console.log(err);
       return null;
     }
-    return payload;
   }
   async refreshToken(token: string) {
     const payloadOldToken = await this.findUserByToken(token);

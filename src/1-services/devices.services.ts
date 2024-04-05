@@ -6,7 +6,7 @@ import { DevicesRepository } from '../2-repositories/devices.repository';
 export class DevicesServices {
   constructor(private deviceRepository: DevicesRepository) {}
   async addNewDevice(device: DeviceMainType): Promise<boolean> {
-    return await this.deviceRepository.createSaveNewDevice(device);
+    return this.deviceRepository.createSaveNewDevice(device);
   }
 
   async changeDevice(deviceId: string, iat: number) {
@@ -16,6 +16,17 @@ export class DevicesServices {
       deviceId,
     };
 
-    return await this.deviceRepository.changeDevice(deviceUpdate);
+    return this.deviceRepository.changeDevice(deviceUpdate);
+  }
+
+  async deleteDevice(deviceId: string) {
+    return this.deviceRepository.deleteDevice(deviceId);
+  }
+
+  async deleteAllOtherDevices(
+    userId: string,
+    deviceId: string,
+  ): Promise<boolean> {
+    return this.deviceRepository.deleteAllOtherDevices(userId, deviceId);
   }
 }

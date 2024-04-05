@@ -35,6 +35,12 @@ import { JwtAdapter } from './4-adapters/jwt.adapter';
 import { DevicesServices } from './1-services/devices.services';
 import { DevicesRepository } from './2-repositories/devices.repository';
 import { DeviceSchema, DevicesMainClass } from './3-schemas/devices.schema';
+import { SecurityDevicesController } from './0-controllers/security.devices.controller';
+import { DevicesQueryRepository } from './2-repositories/query/devices.query.repository';
+import {
+  RateLimitMainClass,
+  RateLimitSchema,
+} from './3-schemas/rate.limit.schema';
 
 @Module({
   imports: [
@@ -60,6 +66,10 @@ import { DeviceSchema, DevicesMainClass } from './3-schemas/devices.schema';
         name: DevicesMainClass.name,
         schema: DeviceSchema,
       },
+      {
+        name: RateLimitMainClass.name,
+        schema: RateLimitSchema,
+      },
     ]),
     JwtModule.register({
       global: true,
@@ -74,6 +84,7 @@ import { DeviceSchema, DevicesMainClass } from './3-schemas/devices.schema';
     CommentsController,
     UsersController,
     AuthController,
+    SecurityDevicesController,
   ],
   providers: [
     LoginOrEmailIsAlreadyExistValidator,
@@ -92,8 +103,9 @@ import { DeviceSchema, DevicesMainClass } from './3-schemas/devices.schema';
     BlogsQueryRepository,
     PostsQueryRepository,
     CommentsQueryRepository,
-    DevicesRepository,
+    DevicesQueryRepository,
 
+    DevicesRepository,
     CommentsRepository,
     PostsRepository,
     BlogsRepository,

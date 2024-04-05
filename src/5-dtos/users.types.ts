@@ -6,6 +6,11 @@ export type UsersViewType = {
   email: string;
   createdAt: string;
 };
+export type UsersGetInfoAboutMeType = {
+  userId: ObjectId;
+  login: string;
+  email: string;
+};
 
 export type UsersMainType = {
   _id: ObjectId;

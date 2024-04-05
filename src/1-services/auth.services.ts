@@ -59,7 +59,6 @@ export class AuthServices {
       deviceId: decode.deviceId?.toString(),
       userId: new ObjectId(userId),
     };
-    console.log('deviceId: ' + decode.deviceId.toString());
 
     const addDevice: boolean = await this.deviceServices.addNewDevice(device);
     if (!addDevice) return null;
@@ -108,7 +107,6 @@ export class AuthServices {
         new_user.email,
         new_user.emailConfirmation.confirmationCode,
       );
-      console.log(new_user.emailConfirmation.confirmationCode);
     } catch (error) {
       return false;
     }
@@ -163,7 +161,6 @@ export class AuthServices {
       },
       { expiresIn: '30m' },
     );
-    console.log(recoveryCode);
 
     await this.emailServices.SendEmailForRefreshPassword(email, recoveryCode);
 
@@ -186,5 +183,13 @@ export class AuthServices {
       passInfo.passwordHash,
       passInfo.passwordSalt,
     );
+  }
+
+  async logout(token: string) {
+    const payload = await this.jwtAdapter.getPayloadOfJwt(token);
+    if (!payload) {
+      return false;
+    }
+    return this.deviceServices.deleteDevice(payload.deviceId);
   }
 }

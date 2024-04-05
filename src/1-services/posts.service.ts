@@ -27,7 +27,6 @@ export class PostsService {
       blogName: foundBlog.name,
       createdAt: new Date().toISOString(),
     };
-    //console.log(post);
     return this.postsRepository.createSavePost(post);
   }
 

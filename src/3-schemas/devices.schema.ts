@@ -34,7 +34,6 @@ export class DevicesMainClass {
 
     try {
       await newDevice.save();
-      console.log(newDevice.deviceId);
       return true;
     } catch (err) {
       return false;
