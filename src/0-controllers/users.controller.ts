@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -20,6 +21,7 @@ import { UsersService } from '../1-services/users.service';
 import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
 import { BasicAuthGuard } from '../7-config/guards/basic.auth.guard';
 import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
+import { NotFoundError } from 'rxjs';
 
 @Controller('users')
 export class UsersController {
@@ -61,6 +63,8 @@ export class UsersController {
   async deleteUser(@Param('id', CustomObjectIdValidationPipe) userId: string) {
     const deleteResult: boolean = await this.usersService.deleteUser(userId);
 
-    if (!deleteResult) throw new UnauthorizedException();
+    if (!deleteResult) {
+      throw new NotFoundException();
+    }
   }
 }
