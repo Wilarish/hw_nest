@@ -78,7 +78,7 @@ export class PostsMainClass {
   ): Promise<boolean> {
     try {
       await model.updateMany(
-        { blogId: blogDto._id },
+        { blogId: new ObjectId(blogDto._id) },
         { blogName: blogDto.name },
       );
       return true;

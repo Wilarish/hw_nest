@@ -44,6 +44,7 @@ import {
 import { IsCodeIsAlreadyConfirmedValidator } from './7-config/validation-pipes/custom-decorators/is-email-code-is-already-confirmed';
 import { IsThisEmailExistsValidator } from './7-config/validation-pipes/custom-decorators/is-email-exists';
 import { IsThisEmailConfirmedValidator } from './7-config/validation-pipes/custom-decorators/is-email-already-confirmed';
+import { IsConfirmationCodeExpiredValidator } from './7-config/validation-pipes/custom-decorators/is-confirmation-code-expired';
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { IsThisEmailConfirmedValidator } from './7-config/validation-pipes/custo
     IsCodeIsAlreadyConfirmedValidator,
     IsThisEmailExistsValidator,
     IsThisEmailConfirmedValidator,
+    IsConfirmationCodeExpiredValidator,
 
     AppService,
     BlogsService,

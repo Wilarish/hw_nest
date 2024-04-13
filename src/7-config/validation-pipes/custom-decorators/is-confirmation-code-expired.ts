@@ -8,9 +8,9 @@ import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../../../2-repositories/users.repository';
 import { UsersMainType } from '../../../5-dtos/users.types';
 
-@ValidatorConstraint({ name: 'IsCodeIsAlreadyConfirmed', async: true })
+@ValidatorConstraint({ name: 'IsConfirmationCodeExpired', async: true })
 @Injectable()
-export class IsCodeIsAlreadyConfirmedValidator
+export class IsConfirmationCodeExpiredValidator
   implements ValidatorConstraintInterface
 {
   constructor(private usersRepository: UsersRepository) {}
@@ -20,17 +20,17 @@ export class IsCodeIsAlreadyConfirmedValidator
 
     if (!user) return false;
 
-    if (user.emailConfirmation.isConfirmed) {
+    if (new Date(user.emailConfirmation.expirationDate) < new Date()) {
       return false;
     }
 
     return true;
   }
   defaultMessage(): string {
-    return 'user is already confirmed email or code is incorrect/expired';
+    return 'confirmation code is expired';
   }
 }
-export function IsCodeIsAlreadyConfirmed(
+export function IsConfirmationCodeExpired(
   validationOptions?: ValidationOptions,
 ) {
   return function (object: Object, propertyName: string) {
@@ -38,7 +38,7 @@ export function IsCodeIsAlreadyConfirmed(
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
-      validator: IsCodeIsAlreadyConfirmedValidator,
+      validator: IsConfirmationCodeExpiredValidator,
     });
   };
 }

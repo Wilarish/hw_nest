@@ -8,8 +8,10 @@ import { PostsMainClass, PostsModelType } from '../3-schemas/posts.schema';
 @Injectable()
 export class BlogsRepository {
   constructor(
-    @InjectModel(BlogsMainClass.name) private blogsModel: BlogsModelType,
-    @InjectModel(PostsMainClass.name) private postsModel: PostsModelType,
+    @InjectModel(BlogsMainClass.name)
+    private readonly blogsModel: BlogsModelType,
+    @InjectModel(PostsMainClass.name)
+    private readonly postsModel: PostsModelType,
   ) {}
   async createSaveBlog(blog: BlogsMainType): Promise<string | null> {
     return this.blogsModel.createSaveBlog(blog, this.blogsModel);

@@ -21,6 +21,7 @@ import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
 import { BasicAuthGuard } from '../7-config/guards/basic.auth.guard';
 import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
 import { NotFoundError } from 'rxjs';
+import { callModuleDestroyHook } from '@nestjs/core/hooks';
 
 @Controller('users')
 export class UsersController {
@@ -36,6 +37,16 @@ export class UsersController {
 
     return users;
   }
+  @Get(':id')
+  async getUserById(@Param('id', CustomObjectIdValidationPipe) userId: string) {
+    const user: UsersViewType | null =
+      await this.usersQueryRepository.returnViewUserById(userId);
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return user;
+  }
 
   @Post()
   @UseGuards(BasicAuthGuard)
@@ -48,10 +59,6 @@ export class UsersController {
 
     const user: UsersViewType | null =
       await this.usersQueryRepository.returnViewUserById(idOfCreatedUser);
-
-    console.log(idOfCreatedUser);
-
-    console.log(user);
 
     return user;
   }

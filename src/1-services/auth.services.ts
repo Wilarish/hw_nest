@@ -95,7 +95,11 @@ export class AuthServices {
       createdAt: new Date().toISOString(),
       emailConfirmation: {
         confirmationCode: uuidv4(),
-        expirationDate: add(new Date(), { hours: 2, minutes: 3 }).toISOString(),
+        expirationDate: add(new Date(), {
+          hours: 2,
+          minutes: 0,
+          seconds: 5,
+        }).toISOString(),
         isConfirmed: false,
       },
     };

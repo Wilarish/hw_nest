@@ -3,9 +3,11 @@ import { Trim } from './custom-decorators/trim';
 import { IsCodeIsAlreadyConfirmed } from './custom-decorators/is-email-code-is-already-confirmed';
 import { IsThisEmailExists } from './custom-decorators/is-email-exists';
 import { IsThisEmailConfirmed } from './custom-decorators/is-email-already-confirmed';
+import { IsConfirmationCodeExpired } from './custom-decorators/is-confirmation-code-expired';
 
 export class AuthUUIDCodeValid {
   @IsCodeIsAlreadyConfirmed()
+  @IsConfirmationCodeExpired()
   @Length(20, 250)
   @Trim()
   @IsString()
