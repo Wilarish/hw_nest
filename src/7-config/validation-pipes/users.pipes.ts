@@ -3,20 +3,20 @@ import { Trim } from './custom-decorators/trim';
 import { LoginOrEmailIsAlreadyExist } from './custom-decorators/login-or-email-is-exist.validator';
 
 export class UsersCreateValid {
-  @IsString()
-  @Trim()
-  @Length(3, 10)
   @LoginOrEmailIsAlreadyExist()
+  @Length(3, 10)
+  @Trim()
+  @IsString()
   login: string;
 
-  @IsString()
-  @Trim()
   @Length(6, 20)
+  @Trim()
+  @IsString()
   password: string;
 
-  @IsEmail()
-  @Trim()
-  @Length(1, 50)
   @LoginOrEmailIsAlreadyExist()
+  @Length(1, 50)
+  @Trim()
+  @IsEmail()
   email: string;
 }

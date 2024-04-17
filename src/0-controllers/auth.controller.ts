@@ -95,13 +95,13 @@ export class AuthController {
     const userIp: string =
       req.headers['x-forwarded-for']?.toString() ||
       [req.socket.remoteAddress].toString();
-    const title: string | undefined = req.headers['user-agent']!.toString();
+    const title: string | undefined = req.headers['user-agent'];
 
     const loginResult = await this.authServices.login(
       dto.loginOrEmail,
       dto.password,
       userIp,
-      title,
+      title?.toString(),
     );
 
     if (!loginResult) {
@@ -122,7 +122,7 @@ export class AuthController {
   async registration(@Body() dto: UsersCreateValid) {
     const regResult: boolean = await this.authServices.createUser(dto);
     if (!regResult) {
-      throw new InternalServerErrorException();
+      throw new BadRequestException();
     }
     return true;
   }

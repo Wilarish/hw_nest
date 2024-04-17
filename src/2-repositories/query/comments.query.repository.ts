@@ -75,8 +75,10 @@ export class CommentsQueryRepository {
       items,
     };
   }
-  async returnCommentById(commId: string): Promise<CommentsViewType | null> {
-    const commentsDb = await this.commentsModel.findById(new ObjectId(commId));
+  async returnCommentById(commentId: string): Promise<CommentsViewType | null> {
+    const commentsDb = await this.commentsModel.findById(
+      new ObjectId(commentId),
+    );
     if (!commentsDb) return null;
 
     return {

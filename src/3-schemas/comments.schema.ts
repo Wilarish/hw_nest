@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { CommentsMainType } from '../5-dtos/comments.types';
+import {
+  CommentsMainType,
+  CommentsUpdateWith_id,
+} from '../5-dtos/comments.types';
 import { Model } from 'mongoose';
+import { CommentsCreateUpdateValidate } from '../7-config/validation-pipes/comments.pipes';
 
 @Schema()
 class CommentatorInfo {
@@ -31,7 +35,7 @@ export class CommentsMainClass {
   static async createSaveComment(
     comment: CommentsMainType,
     model: Model<CommentsMainClass>,
-  ) {
+  ): Promise<string | null> {
     const newComment = new model();
 
     newComment._id = comment._id;
@@ -40,8 +44,6 @@ export class CommentsMainClass {
     newComment.createdAt = comment.createdAt;
     newComment.postId = comment.postId;
 
-    // const result = await newBlog.save();
-    // return result.
     try {
       await newComment.save();
       return newComment._id.toString();
@@ -49,16 +51,39 @@ export class CommentsMainClass {
       return null;
     }
   }
+  static async updateSaveComment(
+    commentDto: CommentsUpdateWith_id,
+    model: Model<CommentsMainClass>,
+  ): Promise<boolean> {
+    const comment = await model.findById(new ObjectId(commentDto._id));
+    if (!comment) {
+      return false;
+    }
+
+    comment.content = commentDto.content;
+
+    try {
+      await comment.save();
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
 }
 
 export interface CommentsModelStaticsType {
   createSaveComment: (
-    user: CommentsMainType,
+    comment: CommentsMainType,
     model: Model<CommentsMainClass>,
   ) => Promise<string | null>;
+  updateSaveComment: (
+    commentDto: CommentsUpdateWith_id,
+    model: Model<CommentsMainClass>,
+  ) => Promise<boolean>;
 }
 export const CommentsSchema = SchemaFactory.createForClass(CommentsMainClass);
 export type CommentsModelType = Model<CommentsMainClass> &
   CommentsModelStaticsType;
 
 CommentsSchema.statics.createSaveComment = CommentsMainClass.createSaveComment;
+CommentsSchema.statics.updateSaveComment = CommentsMainClass.updateSaveComment;

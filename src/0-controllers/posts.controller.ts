@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -6,10 +7,13 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsViewType } from '../5-dtos/posts.types';
 import { PostsService } from '../1-services/posts.service';
@@ -20,6 +24,10 @@ import { CommentsViewType } from '../5-dtos/comments.types';
 import { CommentsQueryRepository } from '../2-repositories/query/comments.query.repository';
 import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
 import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
+import { CommentsCreateUpdateValidate } from '../7-config/validation-pipes/comments.pipes';
+import { CommentsService } from '../1-services/comments.service';
+import { Request } from 'express';
+import { BearerAuthGuard } from '../7-config/guards/bearer.auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -27,6 +35,7 @@ export class PostsController {
     private postsService: PostsService,
     private postsQueryRepository: PostsQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
+    private readonly commentsService: CommentsService,
   ) {}
   @Get()
   async getAllPosts(@Query() params: any) {
@@ -44,8 +53,9 @@ export class PostsController {
   async getPostById(@Param('id', CustomObjectIdValidationPipe) postId: string) {
     const foundPost: PostsViewType | null =
       await this.postsQueryRepository.returnViewPostById(postId);
-    if (!foundPost)
-      throw new HttpException('not found 404', HttpStatus.NOT_FOUND);
+    if (!foundPost) {
+      throw new NotFoundException();
+    }
     return foundPost;
   }
   @Get(':id/comments')
@@ -61,8 +71,9 @@ export class PostsController {
         undefined,
       );
 
-    if (!comments)
-      throw new HttpException('404 not found', HttpStatus.NOT_FOUND);
+    if (!comments) {
+      throw new NotFoundException();
+    }
 
     return comments;
   }
@@ -78,7 +89,22 @@ export class PostsController {
 
     return newPost;
   }
-
+  @Post(':id/comments')
+  @UseGuards(BearerAuthGuard)
+  async createCommentForPost(
+    @Body() dto: CommentsCreateUpdateValidate,
+    @Param('id') postId: string,
+    @Req() req: Request,
+  ) {
+    const comment = await this.commentsService.createCommentForPost(
+      postId,
+      dto,
+      req.userId,
+    ); //Object result
+    if (!comment) {
+      throw new NotFoundException();
+    }
+  }
   @Put(':id')
   @HttpCode(204)
   async updatePost(
@@ -88,12 +114,12 @@ export class PostsController {
     const new_post: PostsViewType | null =
       await this.postsQueryRepository.returnViewPostById(postId.toString());
 
-    if (!new_post)
-      throw new HttpException('not found 404', HttpStatus.NOT_FOUND);
+    if (!new_post) throw new NotFoundException();
 
     const resultId: boolean = await this.postsService.updatePost(postId, dto);
-    if (!resultId)
-      throw new HttpException('500 error', HttpStatus.INTERNAL_SERVER_ERROR);
+    if (!resultId) throw new BadRequestException();
+
+    return;
   }
 
   @Delete(':id')
@@ -101,7 +127,9 @@ export class PostsController {
   async deletePost(@Param('id', CustomObjectIdValidationPipe) postId: string) {
     const deleteResult: boolean = await this.postsService.deletePost(postId);
 
-    if (!deleteResult)
-      throw new HttpException('not found', HttpStatus.NOT_FOUND);
+    if (!deleteResult) {
+      throw new NotFoundException();
+    }
+    return;
   }
 }

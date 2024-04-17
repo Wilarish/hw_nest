@@ -27,13 +27,20 @@ export class AuthServices {
     loginOrEmail: string,
     password: string,
     ip: string,
-    title: string,
+    title?: string,
   ) {
     const user: UsersMainType | null =
       await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
 
-    if (!user) return null;
-    if (!user.emailConfirmation.isConfirmed) return null;
+    if (!user) {
+      return null;
+    }
+    if (!user.emailConfirmation.isConfirmed) {
+      return null;
+    }
+    if (!title) {
+      title = 'none';
+    }
 
     const hash: string = await this.bcryptAdapter.passwordHashWithoutSalt(
       password,

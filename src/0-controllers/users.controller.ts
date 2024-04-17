@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -54,8 +55,7 @@ export class UsersController {
     const idOfCreatedUser: string | null =
       await this.usersService.createUser(dto);
 
-    if (!idOfCreatedUser)
-      throw new HttpException('500 error', HttpStatus.INTERNAL_SERVER_ERROR);
+    if (!idOfCreatedUser) throw new BadRequestException();
 
     const user: UsersViewType | null =
       await this.usersQueryRepository.returnViewUserById(idOfCreatedUser);

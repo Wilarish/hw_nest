@@ -7,6 +7,9 @@ export class PostsRepository {
   constructor(
     @InjectModel(PostsMainClass.name) private postsModel: PostsModelType,
   ) {}
+  async findPostById(postId: string): Promise<PostsMainType | null> {
+    return this.postsModel.findById(new ObjectId(postId));
+  }
   async createSavePost(post: PostsMainType): Promise<string | null> {
     return this.postsModel.createSavePost(post, this.postsModel);
   }

@@ -8,6 +8,10 @@ export type CommentsViewType = {
   createdAt: string;
   likesInfo: LikeInfoView;
 };
+export type CommentsUpdateWith_id = {
+  _id: string;
+  content: string;
+};
 
 export type CommentsMainType = {
   _id: ObjectId;
@@ -20,8 +24,4 @@ export type CommentsMainType = {
 type commentatorInfo = {
   userId: ObjectId;
   userLogin: string;
-};
-
-export type CommentsCreateUpdate = {
-  content: string;
 };

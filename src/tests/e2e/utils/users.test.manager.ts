@@ -1,5 +1,10 @@
 import request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
+import { UsersRepository } from '../../../2-repositories/users.repository';
+import { UsersMainType } from '../../../5-dtos/users.types';
+import { ObjectId } from 'mongodb';
+import { add } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 
 export const UsersTestManager = {
   async createUser(data: any, httpServer: any, status: HttpStatus) {
@@ -15,6 +20,35 @@ export const UsersTestManager = {
         .expect(HttpStatus.OK, result.body);
     }
     return result;
+  },
+  async createUserWithRegistration(
+    data: any,
+    httpServer: any,
+    status: HttpStatus,
+  ) {
+    return request(httpServer)
+      .post('/auth/registration')
+      .send(data)
+      .expect(status);
+  },
+  async createUserWithExpiredEmailCode(userRepository: UsersRepository) {
+    const user: UsersMainType = {
+      _id: new ObjectId(),
+      login: 'expired',
+      email: 'expired@ex.com',
+      passwordSalt: '12345',
+      passwordHash: '12345',
+      createdAt: new Date().toISOString(),
+      emailConfirmation: {
+        confirmationCode: uuidv4(),
+        expirationDate: add(new Date(), {
+          hours: -2,
+        }).toISOString(),
+        isConfirmed: false,
+      },
+    };
+    await userRepository.createSaveUser(user);
+    return user.emailConfirmation.confirmationCode;
   },
   // async updateUser(user: any, data: any, httpServer: any, status: HttpStatus) {
   //   const result = await request(httpServer)
