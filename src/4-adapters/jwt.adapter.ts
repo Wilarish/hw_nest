@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../1-services/users.service';
 import { UsersRepository } from '../2-repositories/users.repository';
 import { UsersMainType } from '../5-dtos/users.types';
+import * as cluster from 'cluster';
 
 @Injectable()
 export class JwtAdapter {
@@ -12,7 +13,7 @@ export class JwtAdapter {
   ) {}
 
   async createAccessJwt(userId: string) {
-    return this.jwtService.signAsync({ userId }, { expiresIn: '5m' });
+    return this.jwtService.signAsync({ userId }, { expiresIn: '30m' });
   }
 
   async createRefreshJwt(userId: string, deviceId: string) {
@@ -24,9 +25,10 @@ export class JwtAdapter {
 
   async getPayloadOfJwt(token: string) {
     try {
-      return this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync(token, {
         secret: 'qwerty',
       });
+      return payload;
     } catch (err) {
       console.log(err);
       return null;

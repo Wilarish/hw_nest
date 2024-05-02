@@ -27,83 +27,90 @@ import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custo
 import { CommentsCreateUpdateValidate } from '../7-config/validation-pipes/comments.pipes';
 import { CommentsService } from '../1-services/comments.service';
 import { Request } from 'express';
-import { BearerAuthGuard } from '../7-config/guards/bearer.auth.guard';
+import {
+  BearerAuthGuard,
+  BearerAuthGuardWithout401Exception,
+} from '../7-config/guards/bearer.auth.guard';
+import { LikeStatusValid } from '../7-config/validation-pipes/likes.pipes';
+import { LikesRepository } from '../2-repositories/likes.repository';
+import { LikesServices } from '../1-services/likes.services';
+import { likeTypes } from '../5-dtos/likes.types';
+import { ResponseToControllersHelper } from '../6-helpers/response.to.controllers.helper';
 
 @Controller('posts')
 export class PostsController {
   constructor(
-    private postsService: PostsService,
-    private postsQueryRepository: PostsQueryRepository,
-    private commentsQueryRepository: CommentsQueryRepository,
+    private readonly postsService: PostsService,
+    private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly commentsQueryRepository: CommentsQueryRepository,
     private readonly commentsService: CommentsService,
+    private readonly likesService: LikesServices,
   ) {}
   @Get()
-  async getAllPosts(@Query() params: any) {
-    const pagination: DefaultPaginationType = getDefaultPagination(params);
-    const posts: Paginated<PostsViewType> =
+  @UseGuards(BearerAuthGuardWithout401Exception)
+  async getAllPosts(@Query() params: any, @Req() req: Request) {
+    const result: ResponseToControllersHelper =
       await this.postsQueryRepository.queryFindPaginatedPosts(
-        pagination,
-        undefined,
+        params,
+        req.userId,
       );
 
-    return posts;
+    return ResponseToControllersHelper.checkReturnException(result);
   }
 
   @Get(':id')
-  async getPostById(@Param('id', CustomObjectIdValidationPipe) postId: string) {
-    const foundPost: PostsViewType | null =
-      await this.postsQueryRepository.returnViewPostById(postId);
-    if (!foundPost) {
-      throw new NotFoundException();
-    }
-    return foundPost;
+  @UseGuards(BearerAuthGuardWithout401Exception)
+  async getPostById(
+    @Param('id', CustomObjectIdValidationPipe) postId: string,
+    @Req() req: Request,
+  ) {
+    const result: ResponseToControllersHelper =
+      await this.postsQueryRepository.returnViewPostById(postId, req.userId);
+
+    return ResponseToControllersHelper.checkReturnException(result);
   }
   @Get(':id/comments')
+  @UseGuards(BearerAuthGuardWithout401Exception)
   async getAllCommentsForPost(
     @Param('id', CustomObjectIdValidationPipe) postId: string,
     @Query() params: any,
+    @Req() req: Request,
   ) {
-    const pagination: DefaultPaginationType = getDefaultPagination(params);
-    const comments: Paginated<CommentsViewType> | null =
+    const result: ResponseToControllersHelper =
       await this.commentsQueryRepository.returnQueryComments(
-        pagination,
+        params,
         postId,
-        undefined,
+        req.userId,
       );
 
-    if (!comments) {
-      throw new NotFoundException();
-    }
-
-    return comments;
+    return ResponseToControllersHelper.checkReturnException(result);
   }
 
   @Post()
   async createPost(@Body() dto: PostsCreateUpdateValidate) {
-    const new_postId: string | null = await this.postsService.createPost(dto);
-    if (!new_postId)
-      throw new HttpException('500 error', HttpStatus.INTERNAL_SERVER_ERROR);
+    const result = await this.postsService.createPost(dto);
+    const resultView: ResponseToControllersHelper =
+      await this.postsQueryRepository.returnViewPostById(
+        result.responseData as string,
+      );
 
-    const newPost: PostsViewType | null =
-      await this.postsQueryRepository.returnViewPostById(new_postId);
-
-    return newPost;
+    return ResponseToControllersHelper.checkReturnException(resultView);
   }
   @Post(':id/comments')
   @UseGuards(BearerAuthGuard)
   async createCommentForPost(
     @Body() dto: CommentsCreateUpdateValidate,
-    @Param('id') postId: string,
+    @Param('id', CustomObjectIdValidationPipe) postId: string,
     @Req() req: Request,
   ) {
-    const comment = await this.commentsService.createCommentForPost(
-      postId,
-      dto,
-      req.userId,
-    ); //Object result
-    if (!comment) {
-      throw new NotFoundException();
-    }
+    const result: ResponseToControllersHelper =
+      await this.commentsService.createCommentForPost(postId, dto, req.userId);
+
+    const resultView = await this.commentsQueryRepository.returnCommentById(
+      result.responseData as string,
+    );
+
+    return ResponseToControllersHelper.checkReturnException(resultView);
   }
   @Put(':id')
   @HttpCode(204)
@@ -111,25 +118,33 @@ export class PostsController {
     @Body() dto: PostsCreateUpdateValidate,
     @Param('id', CustomObjectIdValidationPipe) postId: string,
   ) {
-    const new_post: PostsViewType | null =
-      await this.postsQueryRepository.returnViewPostById(postId.toString());
+    const result = await this.postsService.updatePost(postId, dto);
 
-    if (!new_post) throw new NotFoundException();
-
-    const resultId: boolean = await this.postsService.updatePost(postId, dto);
-    if (!resultId) throw new BadRequestException();
-
-    return;
+    return ResponseToControllersHelper.checkReturnException(result);
   }
 
+  @Put(':id/like-status')
+  @UseGuards(BearerAuthGuard)
+  @HttpCode(204)
+  async ratePost(
+    @Body() dto: LikeStatusValid,
+    @Param('id', CustomObjectIdValidationPipe) postId: string,
+    @Req() req: Request,
+  ) {
+    const result = await this.likesService.rateCommentOrPost(
+      postId,
+      dto.likeStatus,
+      req.userId,
+      likeTypes.Post,
+    );
+
+    return ResponseToControllersHelper.checkReturnException(result);
+  }
   @Delete(':id')
   @HttpCode(204)
   async deletePost(@Param('id', CustomObjectIdValidationPipe) postId: string) {
-    const deleteResult: boolean = await this.postsService.deletePost(postId);
+    const result = await this.postsService.deletePost(postId);
 
-    if (!deleteResult) {
-      throw new NotFoundException();
-    }
-    return;
+    return ResponseToControllersHelper.checkReturnException(result);
   }
 }

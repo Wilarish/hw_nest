@@ -4,7 +4,7 @@ import {
   CommentsMainClass,
   CommentsModelType,
 } from '../../3-schemas/comments.schema';
-import { likeStatuses } from '../../5-dtos/likes.types';
+import { LikeInfoView, likeStatuses } from '../../5-dtos/likes.types';
 import { CommentsViewType } from '../../5-dtos/comments.types';
 import { ObjectId } from 'mongodb';
 import {
@@ -13,24 +13,38 @@ import {
 } from '../../5-dtos/pagination.types';
 import { PostsViewType } from '../../5-dtos/posts.types';
 import { PostsQueryRepository } from './posts.query.repository';
+import { RatesHelper } from '../../6-helpers/rates.helper';
+import { getDefaultPagination } from '../../6-helpers/pagination.helpers';
+import {
+  ExceptionsNames,
+  ResponseToControllersHelper,
+} from '../../6-helpers/response.to.controllers.helper';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
     @InjectModel(CommentsMainClass.name)
-    private commentsModel: CommentsModelType,
-    private postsQueryRepo: PostsQueryRepository,
+    private readonly commentsModel: CommentsModelType,
+    private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly ratesHelper: RatesHelper,
   ) {}
 
   async returnQueryComments(
-    pagination: DefaultPaginationType,
+    params: any,
     postId: string,
-    userId: string | undefined,
-  ): Promise<Paginated<CommentsViewType> | null> {
-    const post: PostsViewType | null =
-      await this.postsQueryRepo.returnViewPostById(postId);
+    userId?: string,
+  ): Promise<ResponseToControllersHelper> {
+    const pagination: DefaultPaginationType = getDefaultPagination(params);
 
-    if (!post) return null;
+    const post: ResponseToControllersHelper =
+      await this.postsQueryRepository.returnViewPostById(postId);
+
+    if (!post.responseData) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
+    }
 
     const filter = { postId: postId };
 
@@ -47,50 +61,45 @@ export class CommentsQueryRepository {
     ]);
 
     const pagesCount = Math.ceil(totalCount / pagination.pageSize);
-    // const items: CommentsViewType[] = await RateHelpCommentsArr(
-    //   itemsDb,
-    //   userId,
-    // );
-    const items: CommentsViewType[] = itemsDb.map(
-      (comment): CommentsViewType => {
-        return {
-          id: comment._id,
-          content: comment.content,
-          commentatorInfo: comment.commentatorInfo,
-          createdAt: comment.createdAt,
-          likesInfo: {
-            likesCount: 0,
-            dislikesCount: 0,
-            myStatus: likeStatuses.None,
-          },
-        };
-      },
-    );
+    const items: CommentsViewType[] =
+      await this.ratesHelper.RateHelpCommentsArr(itemsDb, userId);
 
-    return {
+    const responseData: Paginated<CommentsViewType> = {
       pagesCount,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
       totalCount,
       items,
     };
+    return new ResponseToControllersHelper(false, undefined, responseData);
   }
-  async returnCommentById(commentId: string): Promise<CommentsViewType | null> {
+  async returnCommentById(
+    commentId: string,
+    userId?: string,
+  ): Promise<ResponseToControllersHelper> {
     const commentsDb = await this.commentsModel.findById(
       new ObjectId(commentId),
     );
-    if (!commentsDb) return null;
+    if (!commentsDb) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
+    }
 
-    return {
+    const likesInfo: LikeInfoView = await this.ratesHelper.RateHelpComments(
+      commentId,
+      userId,
+    );
+
+    const responseData: CommentsViewType = {
       id: commentsDb._id,
       content: commentsDb.content,
       commentatorInfo: commentsDb.commentatorInfo,
       createdAt: commentsDb.createdAt,
-      likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: likeStatuses.None,
-      },
+      likesInfo,
     };
+
+    return new ResponseToControllersHelper(false, undefined, responseData);
   }
 }

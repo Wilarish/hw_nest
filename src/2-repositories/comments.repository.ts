@@ -37,4 +37,8 @@ export class CommentsRepository {
   async createSaveComment(comment: CommentsMainType) {
     return this.commentsModel.createSaveComment(comment, this.commentsModel);
   }
+
+  async findCommentById(commentId: string) {
+    return this.commentsModel.findById(new ObjectId(commentId));
+  }
 }

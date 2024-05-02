@@ -20,10 +20,15 @@ export type UsersMainType = {
   passwordHash: string;
   createdAt: string;
   emailConfirmation: ConfirmationEmailType;
+  passwordChanging: PasswordChanging;
 };
 
 export type ConfirmationEmailType = {
   confirmationCode: string;
   expirationDate: string;
   isConfirmed: boolean;
+};
+export type PasswordChanging = {
+  setPasswordCode: string;
+  expirationDate: string;
 };

@@ -45,6 +45,11 @@ import { IsCodeIsAlreadyConfirmedValidator } from './7-config/validation-pipes/c
 import { IsThisEmailExistsValidator } from './7-config/validation-pipes/custom-decorators/is-email-exists';
 import { IsThisEmailConfirmedValidator } from './7-config/validation-pipes/custom-decorators/is-email-already-confirmed';
 import { IsConfirmationCodeExpiredValidator } from './7-config/validation-pipes/custom-decorators/is-confirmation-code-expired';
+import { LikesMainClass, LikesSchema } from './3-schemas/likes.schema';
+import { LikesServices } from './1-services/likes.services';
+import { LikesRepository } from './2-repositories/likes.repository';
+import { RatesHelper } from './6-helpers/rates.helper';
+import { ResponseToControllersHelper } from './6-helpers/response.to.controllers.helper';
 
 @Module({
   imports: [
@@ -73,6 +78,10 @@ import { IsConfirmationCodeExpiredValidator } from './7-config/validation-pipes/
       {
         name: RateLimitMainClass.name,
         schema: RateLimitSchema,
+      },
+      {
+        name: LikesMainClass.name,
+        schema: LikesSchema,
       },
     ]),
     JwtModule.register({
@@ -106,6 +115,7 @@ import { IsConfirmationCodeExpiredValidator } from './7-config/validation-pipes/
     EmailServices,
     AuthServices,
     DevicesServices,
+    LikesServices,
 
     UsersQueryRepository,
     BlogsQueryRepository,
@@ -118,10 +128,13 @@ import { IsConfirmationCodeExpiredValidator } from './7-config/validation-pipes/
     PostsRepository,
     BlogsRepository,
     UsersRepository,
+    LikesRepository,
 
     BcryptAdapter,
     emailAdapter,
     JwtAdapter,
+
+    RatesHelper,
   ],
 })
 export class AppModule {}

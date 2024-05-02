@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { UsersMainType } from '../5-dtos/users.types';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { UsersRepository } from '../2-repositories/users.repository';
 import { EmailServices } from './email-service';
 import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
@@ -11,6 +11,10 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtAdapter } from '../4-adapters/jwt.adapter';
 import { DeviceMainType } from '../5-dtos/devices.types';
 import { DevicesServices } from './devices.services';
+import {
+  ExceptionsNames,
+  ResponseToControllersHelper,
+} from '../6-helpers/response.to.controllers.helper';
 
 @Injectable()
 export class AuthServices {
@@ -18,7 +22,6 @@ export class AuthServices {
     protected usersRepository: UsersRepository,
     protected emailServices: EmailServices,
     private bcryptAdapter: BcryptAdapter,
-    private jwtService: JwtService,
     private jwtAdapter: JwtAdapter,
     private deviceServices: DevicesServices,
   ) {}
@@ -28,15 +31,22 @@ export class AuthServices {
     password: string,
     ip: string,
     title?: string,
-  ) {
+  ): Promise<ResponseToControllersHelper> {
     const user: UsersMainType | null =
       await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
 
     if (!user) {
-      return null;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.Unauthorized_401,
+      );
     }
+
     if (!user.emailConfirmation.isConfirmed) {
-      return null;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.Unauthorized_401, ///// 401 or 400 because not a password
+      );
     }
     if (!title) {
       title = 'none';
@@ -46,9 +56,29 @@ export class AuthServices {
       password,
       user.passwordSalt,
     );
-    if (hash !== user.passwordHash) return null;
+    if (hash !== user.passwordHash) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.Unauthorized_401,
+      );
+    }
 
-    return this.createTokensAndDevice(user._id.toString(), ip, title);
+    const tokens = await this.createTokensAndDevice(
+      user._id.toString(),
+      ip,
+      title,
+    );
+
+    const responseData = {
+      accessToken: tokens?.accessToken,
+    };
+
+    return new ResponseToControllersHelper(
+      false,
+      undefined,
+      responseData,
+      tokens?.refreshToken,
+    );
   }
 
   async createTokensAndDevice(userId: string, ip: string, title: string) {
@@ -77,19 +107,32 @@ export class AuthServices {
   }
   async changeTokensAndDevices(token: string) {
     const result = await this.jwtAdapter.refreshToken(token);
-    if (!result) return null;
+    if (!result) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
 
-    const change: boolean = await this.deviceServices.changeDevice(
+    await this.deviceServices.changeDevice(
       result.refreshToken.payload.deviceId,
       result.refreshToken.payload.iat,
     );
-    if (!change) return null;
-    return {
-      refreshToken: result.refreshToken.token,
+
+    const responseData = {
       accessToken: result.accessToken,
     };
+
+    return new ResponseToControllersHelper(
+      false,
+      undefined,
+      responseData,
+      result.refreshToken.token,
+    );
   }
-  async createUser(data: UsersCreateValid): Promise<boolean> {
+  async createUser(
+    data: UsersCreateValid,
+  ): Promise<ResponseToControllersHelper> {
     const passwordInfo: { passwordSalt; passwordHash } =
       await this.bcryptAdapter.passwordHash(data.password);
 
@@ -109,6 +152,10 @@ export class AuthServices {
         }).toISOString(),
         isConfirmed: false,
       },
+      passwordChanging: {
+        setPasswordCode: 'none',
+        expirationDate: 'none',
+      },
     };
 
     await this.usersRepository.createSaveUser(new_user);
@@ -119,26 +166,49 @@ export class AuthServices {
         new_user.emailConfirmation.confirmationCode,
       );
     } catch (error) {
-      return false;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
     }
 
-    return true;
+    return new ResponseToControllersHelper(false);
   }
 
-  async confirmEmail(code: string): Promise<boolean> {
+  async confirmEmail(code: string): Promise<ResponseToControllersHelper> {
     const user: UsersMainType | null =
       await this.usersRepository.findUserByConfirmationCode(code);
 
-    if (!user) return false;
+    if (!user) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
 
-    return await this.usersRepository.updateConfirmation(user._id.toString());
+    const result: boolean = await this.usersRepository.updateConfirmation(
+      user._id.toString(),
+    );
+    if (!result) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
+
+    return new ResponseToControllersHelper(false);
   }
 
-  async resendCode(email: string): Promise<boolean> {
+  async resendCode(email: string): Promise<ResponseToControllersHelper> {
     const user: UsersMainType | null =
       await this.usersRepository.findUserByLoginOrEmail(email);
 
-    if (!user) return false;
+    if (!user) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
 
     const newConfirmationCode: string = uuidv4();
 
@@ -151,56 +221,94 @@ export class AuthServices {
       await this.emailServices.SendEmailForRegistration(
         user.email,
         newConfirmationCode,
-      ); //user.email, newConfirmationCode
+      );
     } catch (error) {
       console.error(error);
-      return false;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
     }
 
-    return true;
+    return new ResponseToControllersHelper(false);
   }
-  async refreshPassword(email: string): Promise<boolean> {
+  async refreshPassword(email: string): Promise<ResponseToControllersHelper> {
     const user: UsersMainType | null =
       await this.usersRepository.findUserByLoginOrEmail(email);
 
     if (!user) {
-      return false;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
     }
-    const recoveryCode: string = await this.jwtService.signAsync(
-      {
-        userid: user._id.toString(),
-      },
-      { expiresIn: '30m' },
+    const changeCode = uuidv4();
+    const expirationDate = add(new Date(), { minutes: 30 }).toISOString();
+
+    await this.emailServices.SendEmailForRefreshPassword(email, changeCode);
+
+    const result: boolean = await this.usersRepository.createChangePasswordCode(
+      user._id.toString(),
+      changeCode,
+      expirationDate,
     );
 
-    await this.emailServices.SendEmailForRefreshPassword(email, recoveryCode);
-
-    return true;
+    if (!result) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
+    return new ResponseToControllersHelper(false);
   }
 
   async setNewPassword(
     newPassword: string,
-    recoveryCode: string,
-  ): Promise<boolean> {
-    const payload = await this.jwtService.verifyAsync(recoveryCode, {
-      secret: 'qwerty',
-    });
-    if (!payload) return false;
+    changeCode: string,
+  ): Promise<ResponseToControllersHelper> {
+    const user =
+      await this.usersRepository.findUserByChangePasswordCode(changeCode);
+
+    if (!user) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
+    if (new Date(user.passwordChanging.expirationDate) < new Date()) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
 
     const passInfo = await this.bcryptAdapter.passwordHash(newPassword);
 
-    return this.usersRepository.changeHashAndSalt(
-      payload.userid,
-      passInfo.passwordHash,
-      passInfo.passwordSalt,
-    );
+    const result: boolean =
+      await this.usersRepository.changeHashSaltPasswordChanging(
+        user._id.toString(),
+        passInfo.passwordHash,
+        passInfo.passwordSalt,
+      );
+
+    if (!result) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
+
+    return new ResponseToControllersHelper(false);
   }
 
-  async logout(token: string) {
+  async logout(token: string): Promise<ResponseToControllersHelper> {
     const payload = await this.jwtAdapter.getPayloadOfJwt(token);
     if (!payload) {
-      return false;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
     }
-    return this.deviceServices.deleteDevice(payload.deviceId);
+    return this.deviceServices.deleteDevice(payload.deviceId, payload.userId);
   }
 }

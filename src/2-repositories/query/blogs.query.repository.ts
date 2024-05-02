@@ -10,18 +10,38 @@ import {
 import { PostsViewType } from '../../5-dtos/posts.types';
 import { PostsMainClass, PostsModelType } from '../../3-schemas/posts.schema';
 import { likeStatuses } from '../../5-dtos/likes.types';
+import { RatesHelper } from '../../6-helpers/rates.helper';
+import {
+  ExceptionsNames,
+  ResponseToControllersHelper,
+} from '../../6-helpers/response.to.controllers.helper';
+import {
+  getBlogsPagination,
+  getDefaultPagination,
+} from '../../6-helpers/pagination.helpers';
 
 export class BlogsQueryRepository {
   constructor(
     @InjectModel(BlogsMainClass.name) private blogsModel: BlogsModelType,
     @InjectModel(PostsMainClass.name) private postsModel: PostsModelType,
+    private readonly ratesHelper: RatesHelper,
   ) {}
 
-  async returnViewPostsForBlogsById(
+  async returnViewPostsForBlogById(
     blogId: string,
-    pagination: DefaultPaginationType,
-    //userId: string | undefined,
-  ): Promise<Paginated<PostsViewType>> {
+    params: any,
+    userId?: string,
+  ): Promise<ResponseToControllersHelper> {
+    const pagination = getDefaultPagination(params);
+
+    const blogDb = await this.blogsModel.findById(new ObjectId(blogId));
+    if (!blogDb) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
+    }
+
     const filter = { blogId: new ObjectId(blogId) };
 
     const [itemsDb, totalCount] = await Promise.all([
@@ -37,49 +57,46 @@ export class BlogsQueryRepository {
 
     const pagesCount = Math.ceil(totalCount / pagination.pageSize);
 
-    //const items: PostsViewType[] = await RateHelpPostsArr(itemsDb, userId);
-    const items: PostsViewType[] = itemsDb.map((post) => {
-      return {
-        id: post._id,
-        title: post.title,
-        shortDescription: post.shortDescription,
-        content: post.content,
-        blogId: post.blogId,
-        blogName: post.blogName,
-        createdAt: post.createdAt,
-        extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: likeStatuses.None,
-          newestLikes: [],
-        },
-      };
-    });
+    const items: PostsViewType[] = await this.ratesHelper.RateHelpPostsArr(
+      itemsDb,
+      userId,
+    );
 
-    return {
+    const data: Paginated<PostsViewType> = {
       pagesCount,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
       totalCount,
       items,
     };
+
+    return new ResponseToControllersHelper(false, undefined, data);
   }
-  async returnViewBlogById(id: string): Promise<BlogsViewType | null> {
-    const blog = await this.blogsModel.findById(new ObjectId(id));
-    if (!blog) return null;
-    return {
-      id: blog._id,
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: blog.createdAt,
-      isMembership: blog.isMembership,
+  async returnViewBlogById(
+    blogId: string,
+  ): Promise<ResponseToControllersHelper> {
+    const blogDb = await this.blogsModel.findById(new ObjectId(blogId));
+    if (!blogDb) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
+    }
+    const data: BlogsViewType = {
+      id: blogDb._id,
+      name: blogDb.name,
+      description: blogDb.description,
+      websiteUrl: blogDb.websiteUrl,
+      createdAt: blogDb.createdAt,
+      isMembership: blogDb.isMembership,
     };
+
+    return new ResponseToControllersHelper(false, undefined, data);
   }
 
-  async returnAllViewBlogs(
-    pagination: BlogsPaginationType,
-  ): Promise<Paginated<BlogsViewType>> {
+  async returnAllViewBlogs(params: any): Promise<ResponseToControllersHelper> {
+    const pagination: BlogsPaginationType = getBlogsPagination(params);
+
     const filter = {
       name: { $regex: pagination.searchNameTerm, $options: 'i' },
     };
@@ -109,12 +126,14 @@ export class BlogsQueryRepository {
       };
     });
 
-    return {
+    const data: Paginated<BlogsViewType> = {
       pagesCount,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
       totalCount,
       items,
     };
+
+    return new ResponseToControllersHelper(false, undefined, data);
   }
 }

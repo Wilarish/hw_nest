@@ -4,6 +4,14 @@ import { UsersMainType } from '../5-dtos/users.types';
 import { Model } from 'mongoose';
 
 @Schema({ _id: false })
+class PasswordChanging {
+  @Prop({ required: true })
+  setPasswordCode: string;
+
+  @Prop({ required: true })
+  expirationDate: string;
+}
+@Schema({ _id: false })
 class EmailConfirmationClass {
   @Prop({ required: true })
   confirmationCode: string;
@@ -37,6 +45,9 @@ export class UsersMainClass {
   @Prop({ required: true })
   emailConfirmation: EmailConfirmationClass;
 
+  @Prop({ required: true })
+  passwordChanging: PasswordChanging;
+
   static async createSaveUser(
     user: UsersMainType,
     model: Model<UsersMainClass>,
@@ -50,6 +61,7 @@ export class UsersMainClass {
     newUser.passwordHash = user.passwordHash;
     newUser.createdAt = user.createdAt;
     newUser.emailConfirmation = user.emailConfirmation;
+    newUser.passwordChanging = user.passwordChanging;
 
     try {
       await newUser.save();

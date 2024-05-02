@@ -46,9 +46,26 @@ export const UsersTestManager = {
         }).toISOString(),
         isConfirmed: false,
       },
+      passwordChanging: {
+        setPasswordCode: 'none',
+        expirationDate: 'none',
+      },
     };
     await userRepository.createSaveUser(user);
     return user.emailConfirmation.confirmationCode;
+  },
+  async loginUser(data: any, httpServer, status: HttpStatus) {
+    const result = await request(httpServer)
+      .post('/auth/login')
+      .send(data)
+      .expect(status);
+    if (status === HttpStatus.OK) {
+      return {
+        accessToken: result.body.accessToken,
+        refreshToken: result.header['set-cookie'],
+      };
+    }
+    return result.body;
   },
   // async updateUser(user: any, data: any, httpServer: any, status: HttpStatus) {
   //   const result = await request(httpServer)
@@ -84,6 +101,36 @@ export const UsersTestData = {
     login: 'string2',
     email: 'string2@str.com',
     password: 'string1234567',
+  },
+  correctCreateUser_3: {
+    login: 'string3',
+    email: 'string3@str.com',
+    password: 'string1',
+  },
+  correctCreateUser_4: {
+    login: 'string4',
+    email: 'string4@str.com',
+    password: 'string1',
+  },
+  loginCreateUser: {
+    loginOrEmail: 'string',
+    password: 'string12345',
+  },
+  loginCreateUser_2: {
+    loginOrEmail: 'string2',
+    password: 'string1234567',
+  },
+  loginCreateUser_3: {
+    loginOrEmail: 'string3',
+    password: 'string1',
+  },
+  loginCreateUser_4: {
+    loginOrEmail: 'string4',
+    password: 'string1',
+  },
+  incorrectLoginUser: {
+    loginOrEmail: 123,
+    password: 123,
   },
   incorrectCreateUser: {
     login: 123,

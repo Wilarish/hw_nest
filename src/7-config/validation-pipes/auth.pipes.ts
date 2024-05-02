@@ -1,4 +1,4 @@
-import { IsEmail, IsJWT, IsString, Length } from 'class-validator';
+import { IsEmail, IsJWT, IsString, IsUUID, Length } from 'class-validator';
 import { Trim } from './custom-decorators/trim';
 import { IsCodeIsAlreadyConfirmed } from './custom-decorators/is-email-code-is-already-confirmed';
 import { IsThisEmailExists } from './custom-decorators/is-email-exists';
@@ -13,9 +13,17 @@ export class AuthUUIDCodeValid {
   @IsString()
   code: string;
 }
-export class AuthEmailValid {
+export class AuthEmailConfirmationValid {
   @IsThisEmailExists()
   @IsThisEmailConfirmed()
+  @Length(5, 100)
+  @Trim()
+  @IsEmail()
+  @IsString()
+  email: string;
+}
+export class AuthPasswordRecoveryValid {
+  @IsThisEmailExists()
   @Length(5, 100)
   @Trim()
   @IsEmail()
@@ -30,7 +38,7 @@ export class AuthNewPassValid {
 
   @Length(5, 500)
   @Trim()
-  @IsJWT()
+  @IsUUID()
   @IsString()
   recoveryCode: string;
 }

@@ -59,11 +59,40 @@ export class UsersRepository {
     return result.modifiedCount === 1;
   }
 
-  async changeHashAndSalt(userId: string, hash: string, salt: string) {
+  async changeHashSaltPasswordChanging(
+    userId: string,
+    hash: string,
+    salt: string,
+  ) {
     const result = await this.usersModel.updateOne(
       { _id: new ObjectId(userId) },
-      { passwordHash: hash, passwordSalt: salt },
+      {
+        passwordHash: hash,
+        passwordSalt: salt,
+        'passwordChanging.setPasswordCode': 'none',
+        'passwordChanging.expirationDate': 'none',
+      },
     );
     return result.modifiedCount === 1;
+  }
+
+  async createChangePasswordCode(
+    userId: string,
+    changeCode: string,
+    expirationDate: string,
+  ) {
+    const result = await this.usersModel.updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        'passwordChanging.setPasswordCode': changeCode,
+        'passwordChanging.expirationDate': expirationDate,
+      },
+    );
+    return result.modifiedCount === 1;
+  }
+  async findUserByChangePasswordCode(changeCode: string) {
+    return this.usersModel.findOne({
+      'passwordChanging.setPasswordCode': changeCode,
+    });
   }
 }

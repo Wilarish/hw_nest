@@ -43,6 +43,31 @@ export const PostsTestManager = {
     }
     return { changePost: changePost?.body, result };
   },
+  async ratePost(
+    data: {
+      token: string;
+      postId: string;
+      likeStatus: string;
+    },
+    httpServer: any,
+    status: HttpStatus,
+  ) {
+    const result = await request(httpServer)
+      .put(`/posts/${data.postId}/like-status`)
+      .set('Authorization', `Bearer ${data.token}`)
+      .send({ likeStatus: data.likeStatus })
+      .expect(status);
+
+    if (status === HttpStatus.NO_CONTENT) {
+      const result = await request(httpServer)
+        .get(`/posts/${data.postId}`)
+        .set('Authorization', `Bearer ${data.token}`);
+
+      expect(result.body?.extendedLikesInfo.myStatus).toBe(data.likeStatus);
+      return;
+    }
+    return result;
+  },
 };
 export const PostsTestData = {
   correctCreatePost_WITHOUT_blogId: {

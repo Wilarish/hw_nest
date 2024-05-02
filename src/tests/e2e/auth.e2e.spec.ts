@@ -103,7 +103,7 @@ describe('auth', () => {
       );
 
       regUserFromDb!.emailConfirmation = updatedUser!.emailConfirmation;
-    });
+    }, 10000);
 
     it('shouldn`t resend code on not existed email', async () => {
       await request(httpServer)
@@ -160,20 +160,17 @@ describe('auth', () => {
   describe('login_me_refreshToken', () => {
     let refreshToken;
     let accessToken;
-    let createdUser: UsersMainType;
     beforeAll(async () => {
       await request(httpServer)
         .delete('/testing/all-data')
         .expect(HttpStatus.NO_CONTENT);
     });
     it('should create user with correct data', async () => {
-      const response = await UsersTestManager.createUser(
+      await UsersTestManager.createUser(
         UsersTestData.correctCreateUser,
         httpServer,
         HttpStatus.CREATED,
       );
-
-      createdUser = response.body;
     });
 
     it('should response 401 because wrong login/email or password', async () => {
@@ -195,14 +192,13 @@ describe('auth', () => {
     });
 
     it('should response 400 because wrong login/email or password', async () => {
-      const result = await request(httpServer)
-        .post('/auth/login')
-        .send({
-          loginOrEmail: 1234,
-          password: 1234,
-        })
-        .expect(HttpStatus.BAD_REQUEST);
-      expect(result.body).toEqual({
+      const result = await UsersTestManager.loginUser(
+        UsersTestData.incorrectLoginUser,
+        httpServer,
+        HttpStatus.BAD_REQUEST,
+      );
+
+      expect(result).toEqual({
         errorsMessages: [
           {
             message: expect.any(String),
@@ -217,17 +213,13 @@ describe('auth', () => {
     });
 
     it('should login correct', async () => {
-      const result = await request(httpServer)
-        .post('/auth/login')
-        .set('x-forwarded-for', '12345')
-        .set('user-agent', '12345')
-        .send({
-          loginOrEmail: UsersTestData.correctCreateUser.login,
-          password: UsersTestData.correctCreateUser.password,
-        })
-        .expect(HttpStatus.OK);
-      refreshToken = result.header['set-cookie'];
-      accessToken = result.body.accessToken;
+      const result = await UsersTestManager.loginUser(
+        UsersTestData.loginCreateUser,
+        httpServer,
+        HttpStatus.OK,
+      );
+      refreshToken = result.refreshToken;
+      accessToken = result.accessToken;
     });
     it('shouldn`t return info with incorrect refreshToken', async () => {
       await request(httpServer)
@@ -272,6 +264,103 @@ describe('auth', () => {
         .get('/auth/me')
         .set('Cookie', refreshToken)
         .expect(HttpStatus.UNAUTHORIZED);
+    });
+  });
+  describe('refresh password', () => {
+    let changePasswordCode;
+    let accessToken;
+    const expectedEmailError = {
+      errorsMessages: [
+        {
+          field: 'email',
+          message: expect.any(String),
+        },
+      ],
+    };
+    beforeAll(async () => {
+      await request(httpServer)
+        .delete('/testing/all-data')
+        .expect(HttpStatus.NO_CONTENT);
+    });
+    it('should create user and login correct', async () => {
+      await UsersTestManager.createUser(
+        UsersTestData.correctCreateUser,
+        httpServer,
+        HttpStatus.CREATED,
+      );
+      const result = await UsersTestManager.loginUser(
+        UsersTestData.loginCreateUser,
+        httpServer,
+        HttpStatus.OK,
+      );
+      accessToken = result.accessToken;
+    });
+    it('shouldn`t give changePasswordCode to unexpected/incorrect email', async () => {
+      const result = await request(httpServer)
+        .post('/auth/password-recovery')
+        .send({
+          email: UsersTestData.correctCreateUser_2.email,
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+
+      expect(result.body).toEqual(expectedEmailError);
+
+      const result_2 = await request(httpServer)
+        .post('/auth/password-recovery')
+        .send({
+          email: UsersTestData.incorrectCreateUser.email,
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+
+      expect(result_2.body).toEqual(expectedEmailError);
+    });
+    it('should give changePasswordCode correct', async () => {
+      await request(httpServer)
+        .post('/auth/password-recovery')
+        .send({
+          email: UsersTestData.correctCreateUser.email,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+      const user = await usersRepository.findUserByLoginOrEmail(
+        UsersTestData.correctCreateUser.email,
+      );
+      changePasswordCode = user.passwordChanging.setPasswordCode;
+    });
+    it('shouldn`t change password correct', async () => {
+      await request(httpServer)
+        .post('/auth/new-password')
+        .send({
+          newPassword: 'qwertyuiop',
+          recoveryCode: accessToken,
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+    it('should change password correct', async () => {
+      await request(httpServer)
+        .post('/auth/new-password')
+        .send({
+          newPassword: 'qwertyuiop',
+          recoveryCode: changePasswordCode,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+
+      await UsersTestManager.loginUser(
+        {
+          ...UsersTestData.loginCreateUser,
+          password: 'qwertyuiop',
+        },
+        httpServer,
+        HttpStatus.OK,
+      );
+    });
+    it('shouldn`t change password second time without new code', async () => {
+      await request(httpServer)
+        .post('/auth/new-password')
+        .send({
+          newPassword: 'qwertyuiop',
+          recoveryCode: changePasswordCode,
+        })
+        .expect(HttpStatus.BAD_REQUEST);
     });
   });
 });
