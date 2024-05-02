@@ -11,6 +11,11 @@ import { PostsMainType } from '../5-dtos/posts.types';
 import { ObjectId } from 'mongodb';
 import { UsersRepository } from '../2-repositories/users.repository';
 import { UsersMainType } from '../5-dtos/users.types';
+import {
+  ExceptionsNames,
+  ResponseToControllersHelper,
+} from '../6-helpers/response.to.controllers.helper';
+import * as console from 'console';
 
 @Injectable()
 export class CommentsService {
@@ -28,16 +33,64 @@ export class CommentsService {
   async updateComment(
     commentId: string,
     data: CommentsCreateUpdateValidate,
-  ): Promise<boolean> {
+    userId: string,
+  ): Promise<ResponseToControllersHelper> {
     const commentDto: CommentsUpdateWith_id = {
       _id: commentId,
       content: data.content,
     };
-    return this.commentsRepository.updateSaveComment(commentDto);
+
+    const commentFromDb =
+      await this.commentsRepository.findCommentById(commentId);
+
+    if (!commentFromDb) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
+    }
+
+    if (userId !== commentFromDb.commentatorInfo.userId.toString()) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.Forbidden_403,
+      );
+    }
+
+    await this.commentsRepository.updateSaveComment(commentDto);
+
+    return new ResponseToControllersHelper(false);
   }
 
-  async deleteComment(commentId: string): Promise<boolean> {
-    return this.commentsRepository.deleteComment(commentId);
+  async deleteComment(
+    commentId: string,
+    userId: string,
+  ): Promise<ResponseToControllersHelper> {
+    const commentDb = await this.commentsRepository.findCommentById(commentId);
+
+    if (!commentDb) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
+    }
+    if (userId !== commentDb.commentatorInfo.userId.toString()) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.Forbidden_403,
+      );
+    }
+
+    const deletedResult: boolean =
+      await this.commentsRepository.deleteComment(commentId);
+    if (!deletedResult) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
+
+    return new ResponseToControllersHelper(false);
   }
 
   async createCommentForPost(
@@ -48,13 +101,19 @@ export class CommentsService {
     const post: PostsMainType | null =
       await this.postsRepository.findPostById(postId);
     if (!post) {
-      return null;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
     }
     const user: UsersMainType | null =
       await this.usersRepository.findUserById(userId);
 
     if (!user) {
-      return null;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
     }
     const newComment: CommentsMainType = {
       _id: new ObjectId(),
@@ -71,8 +130,11 @@ export class CommentsService {
       await this.commentsRepository.createSaveComment(newComment);
 
     if (!commentId) {
-      return null;
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
     }
-    return this.commentsQueryRepository.returnCommentById(commentId);
+    return new ResponseToControllersHelper(false, undefined, commentId);
   }
 }

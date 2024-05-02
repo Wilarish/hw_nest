@@ -2,10 +2,11 @@ import {
   BadRequestException,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -14,49 +15,45 @@ import { JwtRefreshTokenAuthGuard } from '../7-config/guards/refresh.token.auth.
 import { Request } from 'express';
 import { DevicesQueryRepository } from '../2-repositories/query/devices.query.repository';
 import { DeviceViewType } from '../5-dtos/devices.types';
-import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
+import { DevicesRepository } from '../2-repositories/devices.repository';
+import { ResponseToControllersHelper } from '../6-helpers/response.to.controllers.helper';
 
 @Controller('security')
 export class SecurityDevicesController {
   constructor(
     private readonly deviceService: DevicesServices,
     private readonly deviceQueryRepository: DevicesQueryRepository,
+    private readonly deviceRepository: DevicesRepository,
   ) {}
 
   @Get('devices')
   @UseGuards(JwtRefreshTokenAuthGuard)
   async getDevicesForCurrentUser(@Req() req: Request) {
-    const devices: DeviceViewType[] =
+    const result: ResponseToControllersHelper =
       await this.deviceQueryRepository.getDevicesForCurrentUser(req.userId);
-    if (devices.length === 0) {
-      throw new BadRequestException();
-    }
-    return devices;
+
+    return ResponseToControllersHelper.checkReturnException(result);
   }
 
   @Delete('devices')
   @HttpCode(204)
   @UseGuards(JwtRefreshTokenAuthGuard)
   async deleteAllOtherDevices(@Req() req: Request) {
-    const result: boolean = await this.deviceService.deleteAllOtherDevices(
+    const result = await this.deviceService.deleteAllOtherDevices(
       req.userId,
       req.deviceId,
     );
-
-    if (!result) {
-      throw new BadRequestException();
-    }
-    return;
+    return ResponseToControllersHelper.checkReturnException(result);
   }
   @Delete('devices/:id')
   @HttpCode(204)
   @UseGuards(JwtRefreshTokenAuthGuard)
-  async deleteDevice(@Param('id') deviceId: string) {
-    const result: boolean = await this.deviceService.deleteDevice(deviceId);
+  async deleteDevice(@Param('id') deviceId: string, @Req() req: Request) {
+    const result = await this.deviceService.deleteDevice(
+      deviceId,
+      req.userId.toString(),
+    );
 
-    if (!result) {
-      throw new BadRequestException();
-    }
-    return;
+    return ResponseToControllersHelper.checkReturnException(result);
   }
 }

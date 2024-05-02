@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { PostsCreateUpdateWith_id, PostsMainType } from '../5-dtos/posts.types';
+import {
+  PostsCreateUpdateWith_id,
+  PostsMainType,
+  PostsViewType,
+} from '../5-dtos/posts.types';
 import { PostsRepository } from '../2-repositories/posts.repository';
 import { ObjectId } from 'mongodb';
 import { BlogsRepository } from '../2-repositories/blogs.repository';
 import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
+import {
+  ExceptionsNames,
+  ResponseToControllersHelper,
+} from '../6-helpers/response.to.controllers.helper';
+import { using } from 'rxjs';
 
 @Injectable()
 export class PostsService {
@@ -12,11 +21,18 @@ export class PostsService {
     private blogsRepository: BlogsRepository,
   ) {}
 
-  async createPost(postDto: PostsCreateUpdateValidate): Promise<string | null> {
+  async createPost(
+    postDto: PostsCreateUpdateValidate,
+  ): Promise<ResponseToControllersHelper> {
     const foundBlog = await this.blogsRepository.findBlogById(
       postDto.blogId.toString(),
     );
-    if (!foundBlog) return null;
+    if (!foundBlog) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.BadRequest_400,
+      );
+    }
 
     const post: PostsMainType = {
       _id: new ObjectId(),
@@ -27,13 +43,27 @@ export class PostsService {
       blogName: foundBlog.name,
       createdAt: new Date().toISOString(),
     };
-    return this.postsRepository.createSavePost(post);
+    await this.postsRepository.createSavePost(post);
+
+    return new ResponseToControllersHelper(
+      false,
+      undefined,
+      post._id.toString(),
+    );
   }
 
   async updatePost(
     postId: string,
     dto: PostsCreateUpdateValidate,
-  ): Promise<boolean> {
+  ): Promise<ResponseToControllersHelper> {
+    const post = await this.postsRepository.findPostById(postId);
+    if (!post) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
+    }
+
     const newPostDto: PostsCreateUpdateWith_id = {
       _id: new ObjectId(postId),
       title: dto.title,
@@ -41,9 +71,19 @@ export class PostsService {
       content: dto.content,
       blogId: dto.blogId,
     };
-    return this.postsRepository.updateSavePost(newPostDto);
+    await this.postsRepository.updateSavePost(newPostDto);
+
+    return new ResponseToControllersHelper(false);
   }
-  async deletePost(posId: string): Promise<boolean> {
-    return await this.postsRepository.deletePost(posId);
+  async deletePost(posId: string): Promise<ResponseToControllersHelper> {
+    const deleteResult = await this.postsRepository.deletePost(posId);
+
+    if (!deleteResult) {
+      return new ResponseToControllersHelper(
+        true,
+        ExceptionsNames.NotFound_404,
+      );
+    }
+    return new ResponseToControllersHelper(false);
   }
 }
