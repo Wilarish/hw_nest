@@ -18,7 +18,7 @@ export class ResponseToControllersHelper {
     public isError: boolean,
     public exceptionStatus: string | undefined = undefined,
     public responseData: object | string | undefined = undefined,
-    public dataToController: any | undefined = undefined, //object
+    public dataToController: any | undefined = undefined,
   ) {}
   static checkReturnException(response: ResponseToControllersHelper) {
     if (!response?.isError) {

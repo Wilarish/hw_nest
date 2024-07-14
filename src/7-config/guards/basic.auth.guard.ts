@@ -4,9 +4,12 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { ConfigType } from '../../db.connectino.string';
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {
+  constructor(private readonly configService: ConfigService<ConfigType>) {}
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const authString = request.headers.authorization;
@@ -25,7 +28,10 @@ export class BasicAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    if (type !== 'Basic' || decode !== 'admin:qwerty') {
+    if (
+      type !== 'Basic' ||
+      decode !== this.configService.get('ADMIN_LOGIN_PASSWORD', { infer: true })
+    ) {
       throw new UnauthorizedException();
     }
 

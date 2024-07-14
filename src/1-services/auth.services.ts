@@ -1,13 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import { UsersMainType } from '../5-dtos/users.types';
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../2-repositories/users.repository';
 import { EmailServices } from './email-service';
 import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
 import { BcryptAdapter } from '../4-adapters/bcrypt.adapter';
 import { ObjectId } from 'mongodb';
 import { add } from 'date-fns';
-import { JwtService } from '@nestjs/jwt';
 import { JwtAdapter } from '../4-adapters/jwt.adapter';
 import { DeviceMainType } from '../5-dtos/devices.types';
 import { DevicesServices } from './devices.services';

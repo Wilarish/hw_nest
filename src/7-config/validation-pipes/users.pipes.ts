@@ -1,4 +1,4 @@
-import { IsEmail, IsMongoId, IsString, Length } from 'class-validator';
+import { IsEmail, IsString, Length } from 'class-validator';
 import { Trim } from './custom-decorators/trim';
 import { LoginOrEmailIsAlreadyExist } from './custom-decorators/login-or-email-is-exist.validator';
 

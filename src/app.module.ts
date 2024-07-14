@@ -1,3 +1,10 @@
+import { getConfiguration } from './db.connectino.string';
+import { ConfigModule } from '@nestjs/config';
+const configModule = ConfigModule.forRoot({
+  isGlobal: true,
+  load: [getConfiguration],
+});
+
 import { Module } from '@nestjs/common';
 import { AppController } from './0-controllers/app.controller';
 import { AppService } from './1-services/app.service';
@@ -8,7 +15,6 @@ import { PostsService } from './1-services/posts.service';
 import { BlogsRepository } from './2-repositories/blogs.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BlogsMainClass, BlogsSchema } from './3-schemas/blogs.schema';
-import { mongoURI } from './db.connectino.string';
 import { BlogsQueryRepository } from './2-repositories/query/blogs.query.repository';
 import { PostsController } from './0-controllers/posts.controller';
 import { PostsQueryRepository } from './2-repositories/query/posts.query.repository';
@@ -49,10 +55,11 @@ import { LikesMainClass, LikesSchema } from './3-schemas/likes.schema';
 import { LikesServices } from './1-services/likes.services';
 import { LikesRepository } from './2-repositories/likes.repository';
 import { RatesHelper } from './6-helpers/rates.helper';
-import { ResponseToControllersHelper } from './6-helpers/response.to.controllers.helper';
+import { mongoURI } from './test';
 
 @Module({
   imports: [
+    configModule,
     MongooseModule.forRoot(mongoURI),
     MongooseModule.forFeature([
       {
