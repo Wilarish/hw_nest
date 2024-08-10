@@ -4,29 +4,41 @@ import { UsersService } from '../1-services/users.service';
 import { UsersRepository } from '../2-repositories/users.repository';
 import { UsersMainType } from '../5-dtos/users.types';
 import * as cluster from 'cluster';
+import { ConfigService } from '@nestjs/config';
+import { ConfigType } from '../get.configuration';
 
 @Injectable()
 export class JwtAdapter {
   constructor(
-    private jwtService: JwtService,
-    private userRepository: UsersRepository,
+    private readonly jwtService: JwtService,
+    private readonly userRepository: UsersRepository,
+    private readonly configService: ConfigService<ConfigType>,
   ) {}
 
   async createAccessJwt(userId: string) {
-    return this.jwtService.signAsync({ userId }, { expiresIn: '30m' });
+    return this.jwtService.signAsync(
+      { userId },
+      {
+        expiresIn: '30m',
+        secret: this.configService.get('SECRET_JWT', { infer: true }),
+      },
+    );
   }
 
   async createRefreshJwt(userId: string, deviceId: string) {
     return this.jwtService.signAsync(
       { userId, deviceId },
-      { expiresIn: '35m' },
+      {
+        expiresIn: '35m',
+        secret: this.configService.get('SECRET_JWT', { infer: true }),
+      },
     );
   }
 
   async getPayloadOfJwt(token: string) {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: 'qwerty',
+        secret: this.configService.get('SECRET_JWT', { infer: true }),
       });
       return payload;
     } catch (err) {
@@ -38,7 +50,7 @@ export class JwtAdapter {
   async findUserByToken(refreshToken: string) {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: 'qwerty',
+        secret: this.configService.get('SECRET_JWT', { infer: true }),
       });
       const user: UsersMainType | null = await this.userRepository.findUserById(
         payload.userId,

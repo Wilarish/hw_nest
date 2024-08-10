@@ -1,4 +1,4 @@
-import { getConfiguration } from './db.connectino.string';
+import { getConfiguration } from './get.configuration';
 import { ConfigModule } from '@nestjs/config';
 const configModule = ConfigModule.forRoot({
   isGlobal: true,
@@ -56,6 +56,7 @@ import { LikesServices } from './1-services/likes.services';
 import { LikesRepository } from './2-repositories/likes.repository';
 import { RatesHelper } from './6-helpers/rates.helper';
 import { mongoURI } from './test';
+import { BasicAuthGuard } from './7-config/guards/basic.auth.guard';
 
 @Module({
   imports: [
@@ -93,8 +94,7 @@ import { mongoURI } from './test';
     ]),
     JwtModule.register({
       global: true,
-      secret: 'qwerty',
-      signOptions: { expiresIn: '5s' },
+      signOptions: { expiresIn: '50s' },
     }),
   ],
   controllers: [
@@ -113,6 +113,8 @@ import { mongoURI } from './test';
     IsThisEmailExistsValidator,
     IsThisEmailConfirmedValidator,
     IsConfirmationCodeExpiredValidator,
+
+    BasicAuthGuard,
 
     AppService,
     BlogsService,

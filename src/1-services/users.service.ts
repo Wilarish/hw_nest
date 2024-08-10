@@ -34,7 +34,7 @@ export class UsersService {
       passwordHash: passInfo.passwordHash,
       createdAt: new Date().toISOString(),
       emailConfirmation: {
-        confirmationCode: 'SuperUs erCode',
+        confirmationCode: 'SuperUserCode',
         expirationDate: new Date().toISOString(),
         isConfirmed: true,
       },

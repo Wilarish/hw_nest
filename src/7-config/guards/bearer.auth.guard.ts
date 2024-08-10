@@ -8,12 +8,15 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { UsersRepository } from '../../2-repositories/users.repository';
 import { UsersMainType } from '../../5-dtos/users.types';
+import { ConfigService } from '@nestjs/config';
+import { ConfigType } from '../../get.configuration';
 
 @Injectable()
 export class BearerAuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private usersRepository: UsersRepository,
+    private readonly configService: ConfigService<ConfigType>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -24,7 +27,7 @@ export class BearerAuthGuard implements CanActivate {
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: 'qwerty',
+        secret: this.configService.get('SECRET_JWT', { infer: true }),
       });
 
       const user: UsersMainType | null =
@@ -48,8 +51,9 @@ export class BearerAuthGuard implements CanActivate {
 @Injectable()
 export class BearerAuthGuardWithout401Exception implements CanActivate {
   constructor(
-    private jwtService: JwtService,
-    private usersRepository: UsersRepository,
+    private readonly jwtService: JwtService,
+    private readonly usersRepository: UsersRepository,
+    private readonly configService: ConfigService<ConfigType>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -60,7 +64,7 @@ export class BearerAuthGuardWithout401Exception implements CanActivate {
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: 'qwerty',
+        secret: this.configService.get('SECRET_JWT', { infer: true }),
       });
 
       const user: UsersMainType | null =

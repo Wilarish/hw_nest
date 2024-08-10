@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../../db.connectino.string';
+import { ConfigType } from '../../get.configuration';
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {

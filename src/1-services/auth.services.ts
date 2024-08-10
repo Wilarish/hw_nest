@@ -19,7 +19,7 @@ import {
 export class AuthServices {
   constructor(
     protected usersRepository: UsersRepository,
-    protected emailServices: EmailServices,
+    protected emailService: EmailServices,
     private bcryptAdapter: BcryptAdapter,
     private jwtAdapter: JwtAdapter,
     private deviceServices: DevicesServices,
@@ -160,7 +160,7 @@ export class AuthServices {
     await this.usersRepository.createSaveUser(new_user);
 
     try {
-      await this.emailServices.SendEmailForRegistration(
+      await this.emailService.SendEmailForRegistration(
         new_user.email,
         new_user.emailConfirmation.confirmationCode,
       );
@@ -217,7 +217,7 @@ export class AuthServices {
     );
 
     try {
-      await this.emailServices.SendEmailForRegistration(
+      await this.emailService.SendEmailForRegistration(
         user.email,
         newConfirmationCode,
       );
@@ -244,7 +244,7 @@ export class AuthServices {
     const changeCode = uuidv4();
     const expirationDate = add(new Date(), { minutes: 30 }).toISOString();
 
-    await this.emailServices.SendEmailForRefreshPassword(email, changeCode);
+    await this.emailService.SendEmailForRefreshPassword(email, changeCode);
 
     const result: boolean = await this.usersRepository.createChangePasswordCode(
       user._id.toString(),
