@@ -9,7 +9,7 @@ import { Request } from 'express';
 import { UsersRepository } from '../../2-repositories/users.repository';
 import { UsersMainType } from '../../5-dtos/users.types';
 import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../../get.configuration';
+import { ConfigType } from '../get.configuration';
 
 @Injectable()
 export class BearerAuthGuard implements CanActivate {

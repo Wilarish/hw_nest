@@ -5,7 +5,7 @@ import { UsersRepository } from '../2-repositories/users.repository';
 import { UsersMainType } from '../5-dtos/users.types';
 import * as cluster from 'cluster';
 import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../get.configuration';
+import { ConfigType } from '../7-config/get.configuration';
 
 @Injectable()
 export class JwtAdapter {

@@ -1,4 +1,4 @@
-import { getConfiguration } from './get.configuration';
+import { getConfiguration } from './7-config/get.configuration';
 import { ConfigModule } from '@nestjs/config';
 const configModule = ConfigModule.forRoot({
   isGlobal: true,
@@ -57,10 +57,22 @@ import { LikesRepository } from './2-repositories/likes.repository';
 import { RatesHelper } from './6-helpers/rates.helper';
 import { mongoURI } from './test';
 import { BasicAuthGuard } from './7-config/guards/basic.auth.guard';
+import * as Joi from 'joi';
 
 @Module({
   imports: [
     configModule,
+    ConfigModule.forRoot({
+      validationSchema: Joi.object({
+        NODE_ENV: Joi.string()
+          .valid('development', 'production', 'test', 'provision')
+          .default('development'),
+        PORT: Joi.number().port().default(3000),
+        MONGO_URL: Joi.string().required(),
+        SECRET_JWT: Joi.string().required(),
+        ADMIN_LOGIN_PASSWORD: Joi.string().required(),
+      }),
+    }),
     MongooseModule.forRoot(mongoURI),
     MongooseModule.forFeature([
       {

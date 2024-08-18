@@ -5,7 +5,7 @@ import { PostsRepository } from '../2-repositories/posts.repository';
 import { UsersRepository } from '../2-repositories/users.repository';
 import { CommentsRepository } from '../2-repositories/comments.repository';
 import { ConfigService } from '@nestjs/config';
-import { ConfigType } from '../get.configuration';
+import { ConfigType } from '../7-config/get.configuration';
 
 @Controller()
 export class AppController {
