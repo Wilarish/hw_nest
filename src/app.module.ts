@@ -67,7 +67,7 @@ import * as Joi from 'joi';
         NODE_ENV: Joi.string()
           .valid('development', 'production', 'test', 'provision')
           .default('development'),
-        PORT: Joi.number().port().default(3000),
+        PORT: Joi.number().port().default(10000),
         MONGO_URL: Joi.string().required(),
         SECRET_JWT: Joi.string().required(),
         ADMIN_LOGIN_PASSWORD: Joi.string().required(),
