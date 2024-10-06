@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { PostsMainClass } from './posts.schema';
 
 @Schema()
 export class RateLimitMainClass {

@@ -10,11 +10,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../1-services/users.service';
-import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
-import { BasicAuthGuard } from '../7-config/guards/basic.auth.guard';
-import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
 import { ResponseToControllersHelper } from '../6-helpers/response.to.controllers.helper';
 import { UsersQueryRepository } from '../2-repositories/query/users.query.repository';
+import { CustomObjectIdValidationPipe } from '../7-common/validation-pipes/custom-objectId-pipe';
+import { BasicAuthGuard } from '../7-common/guards/basic.auth.guard';
+import { UsersCreateValid } from '../7-common/validation-pipes/users.pipes';
 
 @Controller('users')
 export class UsersController {

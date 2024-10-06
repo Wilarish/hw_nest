@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import {
-  PostsCreateUpdateWith_id,
-  PostsMainType,
-  PostsViewType,
-} from '../5-dtos/posts.types';
+import { PostsCreateUpdateWith_id, PostsMainType } from '../5-dtos/posts.types';
 import { PostsRepository } from '../2-repositories/posts.repository';
 import { ObjectId } from 'mongodb';
 import { BlogsRepository } from '../2-repositories/blogs.repository';
-import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
 import {
   ExceptionsNames,
   ResponseToControllersHelper,
 } from '../6-helpers/response.to.controllers.helper';
-import { using } from 'rxjs';
+import { PostsCreateUpdateValidate } from '../7-common/validation-pipes/posts.pipes';
 
 @Injectable()
 export class PostsService {

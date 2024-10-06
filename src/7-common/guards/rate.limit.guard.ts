@@ -3,12 +3,7 @@ import {
   ExecutionContext,
   HttpException,
   Injectable,
-  PayloadTooLargeException,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { DevicesRepository } from '../../2-repositories/devices.repository';
-import { JwtAdapter } from '../../4-adapters/jwt.adapter';
-import { DeviceMainType } from '../../5-dtos/devices.types';
 import { RateLimitType } from '../../5-dtos/rate.limit.types';
 import { InjectModel } from '@nestjs/mongoose';
 import { RateLimitMainClass } from '../../3-schemas/rate.limit.schema';

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { LikesMainType, likeTypes } from '../5-dtos/likes.types';
+import { likeTypes } from '../5-dtos/likes.types';
 import { Model } from 'mongoose';
 
 @Schema()

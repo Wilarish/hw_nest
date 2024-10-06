@@ -5,7 +5,6 @@ import {
   CommentsUpdateWith_id,
 } from '../5-dtos/comments.types';
 import { Model } from 'mongoose';
-import { CommentsCreateUpdateValidate } from '../7-config/validation-pipes/comments.pipes';
 
 @Schema()
 class CommentatorInfo {

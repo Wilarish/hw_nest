@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
 import {
   CommentsMainClass,
   CommentsModelType,
@@ -10,7 +9,6 @@ import {
   CommentsUpdateWith_id,
 } from '../5-dtos/comments.types';
 import { ObjectId } from 'mongodb';
-import { CommentsCreateUpdateValidate } from '../7-config/validation-pipes/comments.pipes';
 
 @Injectable()
 export class CommentsRepository {

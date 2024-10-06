@@ -1,14 +1,9 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   HttpCode,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
   Param,
   Put,
   Req,
@@ -16,22 +11,17 @@ import {
 } from '@nestjs/common';
 import { CommentsService } from '../1-services/comments.service';
 import { CommentsQueryRepository } from '../2-repositories/query/comments.query.repository';
-import { CommentsViewType } from '../5-dtos/comments.types';
-import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
-import { CommentsCreateUpdateValidate } from '../7-config/validation-pipes/comments.pipes';
-import {
-  BearerAuthGuard,
-  BearerAuthGuardWithout401Exception,
-} from '../7-config/guards/bearer.auth.guard';
 import { Request } from 'express';
-import request from 'supertest';
-import * as stream from 'stream';
-import * as string_decoder from 'string_decoder';
-import { parseAnyDigitsSigned } from 'date-fns/parse/_lib/utils';
-import { LikeStatusValid } from '../7-config/validation-pipes/likes.pipes';
 import { LikesServices } from '../1-services/likes.services';
 import { likeTypes } from '../5-dtos/likes.types';
 import { ResponseToControllersHelper } from '../6-helpers/response.to.controllers.helper';
+import {
+  BearerAuthGuard,
+  BearerAuthGuardWithout401Exception,
+} from '../7-common/guards/bearer.auth.guard';
+import { CustomObjectIdValidationPipe } from '../7-common/validation-pipes/custom-objectId-pipe';
+import { CommentsCreateUpdateValidate } from '../7-common/validation-pipes/comments.pipes';
+import { LikeStatusValid } from '../7-common/validation-pipes/likes.pipes';
 
 @Controller('comments')
 export class CommentsController {

@@ -5,9 +5,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
-import { HttpExceptionFilter } from './7-config/exeption-filters/exeption.filter';
 import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './7-common/exeption-filters/exeption.filter';
 
 export const AppSettings = (app: INestApplication) => {
   app.use(cookieParser());

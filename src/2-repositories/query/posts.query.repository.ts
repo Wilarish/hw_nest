@@ -7,7 +7,6 @@ import { PostsViewType } from '../../5-dtos/posts.types';
 import {
   ExtendedLikesPostsView,
   LikesMainType,
-  likeStatuses,
 } from '../../5-dtos/likes.types';
 import {
   DefaultPaginationType,

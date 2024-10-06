@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DeviceMainType, DeviceUpdateType } from '../5-dtos/devices.types';
 import { DevicesRepository } from '../2-repositories/devices.repository';
 import {

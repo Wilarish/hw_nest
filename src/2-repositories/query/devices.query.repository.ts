@@ -1,11 +1,9 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { BadRequestException, Injectable, Res } from '@nestjs/common';
-import { DevicesRepository } from '../devices.repository';
+import { Injectable } from '@nestjs/common';
 import {
   DeviceModelType,
   DevicesMainClass,
 } from '../../3-schemas/devices.schema';
-import { DeviceMainType, DeviceViewType } from '../../5-dtos/devices.types';
 import { ObjectId } from 'mongodb';
 import {
   ExceptionsNames,

@@ -1,22 +1,18 @@
 import {
-  BadRequestException,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   HttpCode,
-  NotFoundException,
   Param,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { DevicesServices } from '../1-services/devices.services';
-import { JwtRefreshTokenAuthGuard } from '../7-config/guards/refresh.token.auth.guard';
 import { Request } from 'express';
 import { DevicesQueryRepository } from '../2-repositories/query/devices.query.repository';
-import { DeviceViewType } from '../5-dtos/devices.types';
 import { DevicesRepository } from '../2-repositories/devices.repository';
 import { ResponseToControllersHelper } from '../6-helpers/response.to.controllers.helper';
+import { JwtRefreshTokenAuthGuard } from '../7-common/guards/refresh.token.auth.guard';
 
 @Controller('security')
 export class SecurityDevicesController {

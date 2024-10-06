@@ -5,10 +5,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../app.module';
 import { AppSettings } from '../../app.settings';
 import { HttpStatus } from '@nestjs/common';
-import { PostsCreateUpdateValidate } from '../../7-config/validation-pipes/posts.pipes';
 import { BlogsTestData, BlogsTestManager } from './utils/blogs.test.manager';
 import { PostsTestData, PostsTestManager } from './utils/posts.test.manager';
 import { ObjectId } from 'mongodb';
+import { PostsCreateUpdateValidate } from '../../7-common/validation-pipes/posts.pipes';
 
 describe('/posts_CRUD', () => {
   let app;

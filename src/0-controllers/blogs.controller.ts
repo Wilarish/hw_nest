@@ -13,14 +13,13 @@ import {
 } from '@nestjs/common';
 import { BlogsService } from '../1-services/blogs.service';
 import { BlogsQueryRepository } from '../2-repositories/query/blogs.query.repository';
-import { PostsService } from '../1-services/posts.service';
 import { PostsQueryRepository } from '../2-repositories/query/posts.query.repository';
-import { BlogsCreateUpdateValid } from '../7-config/validation-pipes/blogs.pipes';
-import { PostsCreateInBlogsControllerValidate } from '../7-config/validation-pipes/posts.pipes';
-import { CustomObjectIdValidationPipe } from '../7-config/validation-pipes/custom-objectId-pipe';
-import { BearerAuthGuardWithout401Exception } from '../7-config/guards/bearer.auth.guard';
 import { Request } from 'express';
 import { ResponseToControllersHelper } from '../6-helpers/response.to.controllers.helper';
+import { CustomObjectIdValidationPipe } from '../7-common/validation-pipes/custom-objectId-pipe';
+import { BearerAuthGuardWithout401Exception } from '../7-common/guards/bearer.auth.guard';
+import { BlogsCreateUpdateValid } from '../7-common/validation-pipes/blogs.pipes';
+import { PostsCreateInBlogsControllerValidate } from '../7-common/validation-pipes/posts.pipes';
 
 @Controller('blogs')
 export class BlogsController {

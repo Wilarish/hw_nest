@@ -1,18 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import {
-  UsersGetInfoAboutMeType,
-  UsersMainType,
-  UsersViewType,
-} from '../5-dtos/users.types';
+import { UsersGetInfoAboutMeType, UsersMainType } from '../5-dtos/users.types';
 import { BcryptAdapter } from '../4-adapters/bcrypt.adapter';
 import { ObjectId } from 'mongodb';
 import { UsersRepository } from '../2-repositories/users.repository';
-import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
 import {
   ExceptionsNames,
   ResponseToControllersHelper,
 } from '../6-helpers/response.to.controllers.helper';
 import { UsersQueryRepository } from '../2-repositories/query/users.query.repository';
+import { UsersCreateValid } from '../7-common/validation-pipes/users.pipes';
 
 @Injectable()
 export class UsersService {

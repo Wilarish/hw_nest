@@ -3,7 +3,6 @@ import { UsersMainType } from '../5-dtos/users.types';
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../2-repositories/users.repository';
 import { EmailServices } from './email-service';
-import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
 import { BcryptAdapter } from '../4-adapters/bcrypt.adapter';
 import { ObjectId } from 'mongodb';
 import { add } from 'date-fns';
@@ -14,6 +13,7 @@ import {
   ExceptionsNames,
   ResponseToControllersHelper,
 } from '../6-helpers/response.to.controllers.helper';
+import { UsersCreateValid } from '../7-common/validation-pipes/users.pipes';
 
 @Injectable()
 export class AuthServices {

@@ -8,23 +8,26 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { UsersCreateValid } from '../7-config/validation-pipes/users.pipes';
+
 import { AuthServices } from '../1-services/auth.services';
 
-import {
-  AuthUUIDCodeValid,
-  AuthEmailConfirmationValid,
-  AuthNewPassValid,
-  AuthLoginValid,
-  AuthPasswordRecoveryValid,
-} from '../7-config/validation-pipes/auth.pipes';
 import { Request, Response } from 'express';
 import { DevicesRepository } from '../2-repositories/devices.repository';
-import { JwtRefreshTokenAuthGuard } from '../7-config/guards/refresh.token.auth.guard';
+
 import { UsersService } from '../1-services/users.service';
-import { BasicAuthGuard } from '../7-config/guards/basic.auth.guard';
-import { RateLimitGuard } from '../7-config/guards/rate.limit.guard';
+
 import { ResponseToControllersHelper } from '../6-helpers/response.to.controllers.helper';
+import { BasicAuthGuard } from '../7-common/guards/basic.auth.guard';
+import { RateLimitGuard } from '../7-common/guards/rate.limit.guard';
+import { JwtRefreshTokenAuthGuard } from '../7-common/guards/refresh.token.auth.guard';
+import {
+  AuthEmailConfirmationValid,
+  AuthLoginValid,
+  AuthNewPassValid,
+  AuthPasswordRecoveryValid,
+  AuthUUIDCodeValid,
+} from '../7-common/validation-pipes/auth.pipes';
+import { UsersCreateValid } from '../7-common/validation-pipes/users.pipes';
 
 @Controller('auth')
 export class AuthController {

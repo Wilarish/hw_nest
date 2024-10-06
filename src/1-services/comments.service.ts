@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CommentsRepository } from '../2-repositories/comments.repository';
-import { CommentsCreateUpdateValidate } from '../7-config/validation-pipes/comments.pipes';
 import {
   CommentsMainType,
   CommentsUpdateWith_id,
@@ -15,7 +14,7 @@ import {
   ExceptionsNames,
   ResponseToControllersHelper,
 } from '../6-helpers/response.to.controllers.helper';
-import * as console from 'console';
+import { CommentsCreateUpdateValidate } from '../7-common/validation-pipes/comments.pipes';
 
 @Injectable()
 export class CommentsService {

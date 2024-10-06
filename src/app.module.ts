@@ -1,5 +1,5 @@
-import { getConfiguration } from './7-config/get.configuration';
 import { ConfigModule } from '@nestjs/config';
+import { getConfiguration } from './8-config/get.configuration';
 const configModule = ConfigModule.forRoot({
   isGlobal: true,
   load: [getConfiguration],
@@ -26,10 +26,8 @@ import { CommentsRepository } from './2-repositories/comments.repository';
 import { CommentsQueryRepository } from './2-repositories/query/comments.query.repository';
 import { CommentsController } from './0-controllers/comments.controller';
 import { BcryptAdapter } from './4-adapters/bcrypt.adapter';
-import { IsBlogExistValidator } from './7-config/validation-pipes/custom-decorators/is-blog-exist';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersController } from './0-controllers/users.controller';
-import { LoginOrEmailIsAlreadyExistValidator } from './7-config/validation-pipes/custom-decorators/login-or-email-is-exist.validator';
 import { UsersService } from './1-services/users.service';
 import { UsersQueryRepository } from './2-repositories/query/users.query.repository';
 import { UsersRepository } from './2-repositories/users.repository';
@@ -47,17 +45,19 @@ import {
   RateLimitMainClass,
   RateLimitSchema,
 } from './3-schemas/rate.limit.schema';
-import { IsCodeIsAlreadyConfirmedValidator } from './7-config/validation-pipes/custom-decorators/is-email-code-is-already-confirmed';
-import { IsThisEmailExistsValidator } from './7-config/validation-pipes/custom-decorators/is-email-exists';
-import { IsThisEmailConfirmedValidator } from './7-config/validation-pipes/custom-decorators/is-email-already-confirmed';
-import { IsConfirmationCodeExpiredValidator } from './7-config/validation-pipes/custom-decorators/is-confirmation-code-expired';
 import { LikesMainClass, LikesSchema } from './3-schemas/likes.schema';
 import { LikesServices } from './1-services/likes.services';
 import { LikesRepository } from './2-repositories/likes.repository';
 import { RatesHelper } from './6-helpers/rates.helper';
 import { mongoURI } from './test';
-import { BasicAuthGuard } from './7-config/guards/basic.auth.guard';
 import * as Joi from 'joi';
+import { IsThisEmailConfirmedValidator } from './7-common/validation-pipes/custom-decorators/is-email-already-confirmed';
+import { LoginOrEmailIsAlreadyExistValidator } from './7-common/validation-pipes/custom-decorators/login-or-email-is-exist.validator';
+import { IsBlogExistValidator } from './7-common/validation-pipes/custom-decorators/is-blog-exist';
+import { IsCodeIsAlreadyConfirmedValidator } from './7-common/validation-pipes/custom-decorators/is-email-code-is-already-confirmed';
+import { IsThisEmailExistsValidator } from './7-common/validation-pipes/custom-decorators/is-email-exists';
+import { IsConfirmationCodeExpiredValidator } from './7-common/validation-pipes/custom-decorators/is-confirmation-code-expired';
+import { BasicAuthGuard } from './7-common/guards/basic.auth.guard';
 
 @Module({
   imports: [

@@ -1,26 +1,15 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from '../2-repositories/blogs.repository';
 import { ObjectId } from 'mongodb';
-import {
-  BlogsCreateUpdateWith_id,
-  BlogsMainType,
-  BlogsViewType,
-} from '../5-dtos/blog.types';
-import { BlogsCreateUpdateValid } from '../7-config/validation-pipes/blogs.pipes';
+import { BlogsCreateUpdateWith_id, BlogsMainType } from '../5-dtos/blog.types';
+
 import {
   ExceptionsNames,
   ResponseToControllersHelper,
 } from '../6-helpers/response.to.controllers.helper';
-import {
-  PostsCreateInBlogsControllerValidate,
-  PostsCreateUpdateValidate,
-} from '../7-config/validation-pipes/posts.pipes';
 import { PostsService } from './posts.service';
+import { BlogsCreateUpdateValid } from '../7-common/validation-pipes/blogs.pipes';
+import { PostsCreateInBlogsControllerValidate } from '../7-common/validation-pipes/posts.pipes';
 
 @Injectable()
 export class BlogsService {

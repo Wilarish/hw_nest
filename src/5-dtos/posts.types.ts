@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { ExtendedLikesPostsView } from './likes.types';
-import { PostsCreateUpdateValidate } from '../7-config/validation-pipes/posts.pipes';
+import { PostsCreateUpdateValidate } from '../7-common/validation-pipes/posts.pipes';
 
 export type PostsViewType = {
   id: ObjectId;

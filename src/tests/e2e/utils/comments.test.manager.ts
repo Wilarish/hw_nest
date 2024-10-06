@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
-import { CommentsCreateUpdateValidate } from '../../../7-config/validation-pipes/comments.pipes';
 import { ObjectId } from 'mongodb';
+import { CommentsCreateUpdateValidate } from '../../../7-common/validation-pipes/comments.pipes';
 
 export const CommentsTestManager = {
   async createComment(

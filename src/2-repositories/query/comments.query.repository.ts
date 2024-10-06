@@ -4,14 +4,13 @@ import {
   CommentsMainClass,
   CommentsModelType,
 } from '../../3-schemas/comments.schema';
-import { LikeInfoView, likeStatuses } from '../../5-dtos/likes.types';
+import { LikeInfoView } from '../../5-dtos/likes.types';
 import { CommentsViewType } from '../../5-dtos/comments.types';
 import { ObjectId } from 'mongodb';
 import {
   DefaultPaginationType,
   Paginated,
 } from '../../5-dtos/pagination.types';
-import { PostsViewType } from '../../5-dtos/posts.types';
 import { PostsQueryRepository } from './posts.query.repository';
 import { RatesHelper } from '../../6-helpers/rates.helper';
 import { getDefaultPagination } from '../../6-helpers/pagination.helpers';
